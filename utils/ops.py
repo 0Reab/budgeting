@@ -26,14 +26,13 @@ def extract_and_insert(data: dict):
 
 
 def image_scan():
-    img = parse_image_path()
+    img = parse_image_path() # should validate return of this func for file ext...
 
     url = scan(img)
     data = fetch(url)
     result = parse(data)
 
     for line_data in result:
-        #print(line_data) # debug
         extract_and_insert(line_data)
 
     log('ok', 'image_scan()', 'xd')

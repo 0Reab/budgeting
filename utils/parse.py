@@ -52,9 +52,8 @@ def parse(response):
     return items
 
 
-def parse_image_path():
+def parse_image_path(img):
     # for now just image name in $pwd
-    img = input('Enter image name: ')
 
     img_ext = img.split('.')[-1]
     allowed_ext = ['jpg', 'png']
