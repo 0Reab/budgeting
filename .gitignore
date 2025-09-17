@@ -1,0 +1,7 @@
+budget.db
+receipt1.jpg
+.vscode/settings.json
+__pycache__/ops.cpython-313.pyc
+__pycache__/parse.cpython-313.pyc
+__pycache__/scanner.cpython-313.pyc
+__pycache__/sql_utils.cpython-313.pyc
