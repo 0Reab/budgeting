@@ -1,11 +1,16 @@
 from bs4 import BeautifulSoup
+from utils.logger import log
 import requests
 import re
 
 
 
 def fetch(url):
-    result = requests.get(url).content
+    try:
+        result = requests.get(url).content
+    except Exception as e:
+        log('fail', 'fetch()', f'URL get request failed with error - {e}')
+        return None
 
     soup = BeautifulSoup(result, features="html.parser")
     response = soup.find_all("pre", {"style" : "font-family:monospace"})

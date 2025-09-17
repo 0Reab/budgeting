@@ -21,4 +21,4 @@ def test_log():
             assert return_val, f"Log [OK]- returned True - {output_str}"
             
 
-    print("All log tests passed")
+    print("[PASSED] log() - all passed")
