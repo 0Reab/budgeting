@@ -14,6 +14,8 @@ def fetch(url):
 
     soup = BeautifulSoup(result, features="html.parser")
     response = soup.find_all("pre", {"style" : "font-family:monospace"})
+
+    log('ok', 'fetch()', 'http response bs4')
     return response
 
 
@@ -23,29 +25,30 @@ def parse(response):
     raw = ''.join(response.split(delimiter)[1])
     #print(raw)
 
-    lines = [l.strip() for l in raw.splitlines() if l.strip()]
+    try:
+        lines = [l.strip() for l in raw.splitlines() if l.strip()]
 
-    items, current_name = [], []
+        items, current_name = [], []
 
-    for line in lines:
-        # Match rows that look like "price qty total"
-        if re.match(r'^[\d\., ]+\d$', line):
-            parts = line.split()
-            price, qty, total = parts
-            items.append({
-                "name": " ".join(current_name),
-                "price": price,
-                "qty": qty,
-                "total": total
-            })
-            current_name = []  # reset for next item
-        elif not line.startswith("Назив") and "износ" not in line and "Платна" not in line:
-            current_name.append(line)
+        for line in lines:
+            # Match rows that look like "price qty total"
+            if re.match(r'^[\d\., ]+\d$', line):
+                parts = line.split()
+                price, qty, total = parts
+                items.append({
+                    "name": " ".join(current_name),
+                    "price": price,
+                    "qty": qty,
+                    "total": total
+                })
+                current_name = []  # reset for next item
+            elif not line.startswith("Назив") and "износ" not in line and "Платна" not in line:
+                current_name.append(line)
 
-    for item in items:
-        pass
-        #print(item)
+    except Exception as e:
+        log('critical', 'parse()', f'html soupe parser failed, good luck - {e}')
 
+    log('success', 'parse()', 'receipt html soup parsed')
     return items
 
 
@@ -57,7 +60,8 @@ def parse_image_path():
     allowed_ext = ['jpg', 'png']
 
     if img_ext not in allowed_ext:
-        print(f'Image argument {img} not jpg or png filetype')
+        log('fail', 'parse_image_path()', f'Image argument {img} not jpg or png filetype')
         return False
     
+    log('ok', 'parse_image_path()', 'valid extension')
     return img
