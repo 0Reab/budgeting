@@ -3,12 +3,13 @@
 
 1. select a category of an item being inserted into db.
 2. complete duplicate entry check and reject insertion.
-3. deployment - access from android? (flask webapp local to my network - easy setup).
+3. deployment - access from browser (flask webapp local to my network - easy setup).
 4. front end?
-5. item classifier via ollama API
-6. uploaded image duplicate detection and rejection
+5. uploaded image duplicate detection and rejection
+6. tests for all functions
+7. later in project - raise test exceptions after all tests run
 
 
 # known bugs
 
-selecting item category on user input is stuck in a infinite loop
+selecting item category on user input is stuck in a infinite loop - fixed - poor return types and truth checks were not robust
