@@ -13,4 +13,4 @@
 # known bugs
 
 selecting item category on user input is stuck in a infinite loop - fixed - poor return types and truth checks were not robust
-sql delete query works with negative integers for id specifier huh?
+sql delete query works with negative integers for id specifier huh? - i forgor validation

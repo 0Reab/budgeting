@@ -83,9 +83,19 @@ def delete():
             return 'abort delete'
     else:
         try:
-            cursor.execute(f"DELETE FROM expenses WHERE id = (?)", (user_input))
-        except sqlite3.ProgrammingError as e:
-            log('fail', 'delete()', f'sql query error with {user_input} - {e}')
+            cursor.execute("SELECT id FROM expenses")
+            rows = cursor.fetchall()
+
+            id_nums = [ row[0] for row in rows]
+
+            if int(user_input) not in id_nums:
+                log('fail', 'delete()', f'not found id={user_input} in DB')
+                return None
+
+            cursor.execute(f"DELETE FROM expenses WHERE id = (?)", [user_input])
+
+        except (sqlite3.ProgrammingError, ValueError, TypeError) as e:
+            log('fail', 'delete()', f'sql query error with id={user_input} - {e}')
             return None
 
     conn.commit()
