@@ -12,7 +12,7 @@ def log(log_type, func, message):
         print(bad_call)
         return None
 
-    log_levels = [ 'INFO', 'ERROR', 'CRITICAL', 'OK', 'FAIL' ]
+    log_levels = [ 'INFO', 'ERROR', 'CRITICAL', 'OK', 'FAIL', 'SUCCESS' ]
 
     if log_type not in log_levels:
         print(bad_call) 
