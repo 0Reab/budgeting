@@ -9,6 +9,12 @@ ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg'}
 app.config['UPLOAD_FOLDER'] = os.path.join(app.root_path, 'images')
 
 
+def read_key():
+    with open('key.txt', 'r') as f:
+        key = f.read()
+    return key
+
+
 def allowed_file(filename):
     return '.' in filename and \
         filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
@@ -47,6 +53,6 @@ def upload():
 
 
 if __name__ == '__main__':
-    app.secret_key = 'fb20^89fbfgS209s$b3lFsh@6t49hf10Ghc'
+    app.secret_key = read_key()
     port = int(os.environ.get('PORT', 1337))
     app.run(host='0.0.0.0', port=port)

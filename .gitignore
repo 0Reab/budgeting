@@ -5,3 +5,4 @@ __pycache__/
 utils/__pycache__/
 tests/__pycache__/
 budget.db-journal
+key.txt

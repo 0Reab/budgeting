@@ -8,6 +8,10 @@
 5. uploaded image duplicate detection and rejection
 6. tests for all functions
 7. later in project - raise test exceptions after all tests run
+8. Move categories into a json configuration
+9. Data dipslay and visualization
+10. Should this backend be separated somehow?
+11. secret key in a file for flask server
 
 
 # known bugs
