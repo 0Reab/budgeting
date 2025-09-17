@@ -1,7 +1,7 @@
 from utils.parse import parse, fetch
 from utils.scanner import scan
 from utils.sql_utils import *
-from ops import *
+from utils.ops import *
 
 
 
