@@ -14,16 +14,15 @@ def extract_and_insert(data: dict):
         category = choose_category(item=name)
         date = todays_date()
 
-        print(f'debug category = {category}')
         if not validate(category, name, price, amount, date):
             return False
 
-        log('success', 'extract_and_insert()', 'data extraction')
+        log('ok', 'extract_and_insert()', 'data extraction')
         return insert(category, name, price, amount, date)
 
 
     except Exception as e:
-        log('critical', 'extract_and_insert()', f'generic exception clause - {e}')
+        log('fail', 'extract_and_insert()', f'generic exception clause - {e}')
 
 
 def image_scan():
@@ -37,7 +36,7 @@ def image_scan():
         #print(line_data) # debug
         extract_and_insert(line_data)
 
-    log('success', 'image_scan()', 'xd')
+    log('ok', 'image_scan()', 'xd')
     return True
 
 
@@ -55,7 +54,7 @@ def choose_category(item): # bug 1.
         #print(type(in_categories(user_categ)), in_categories(user_categ), 'debug 1')
 
         if user_categ is not None:
-            log('ok', 'choose_category()', 'user input')
+            log('ok', 'choose_category()', f'user input {item}')
             return user_categ
 
 

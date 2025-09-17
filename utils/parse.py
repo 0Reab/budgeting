@@ -46,9 +46,9 @@ def parse(response):
                 current_name.append(line)
 
     except Exception as e:
-        log('critical', 'parse()', f'html soupe parser failed, good luck - {e}')
+        log('fail', 'parse()', f'html soupe parser failed, good luck - {e}')
 
-    log('success', 'parse()', 'receipt html soup parsed')
+    log('ok', 'parse()', 'receipt html soup parsed')
     return items
 
 

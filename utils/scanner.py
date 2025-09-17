@@ -8,5 +8,5 @@ def scan(image_path):
     image = cv2.imread(image_path)
     decoded_text = qreader.detect_and_decode(image=image)
 
-    log('success', f'scan({image_path})', 'QR code scanned')
+    log('ok', f'scan({image_path})', 'QR code scanned')
     return decoded_text[0]

@@ -12,7 +12,7 @@ def log(log_type, func, message):
         print(bad_call)
         return None
 
-    log_levels = [ 'INFO', 'ERROR', 'CRITICAL', 'OK', 'FAIL', 'SUCCESS' ]
+    log_levels = [ 'INFO', 'OK', 'FAIL' ]
 
     if log_type not in log_levels:
         print(bad_call) 
@@ -20,7 +20,15 @@ def log(log_type, func, message):
 
     # log output
 
-    log_result = f'[{log_type}] in {func} - {message}'
+    color = {
+        'OK': '\033[92m',
+        'FAIL': '\033[91m',
+        'INFO': '\033[93m',
+        'END': '\033[0m',
+    }
+
+
+    log_result = f'{color[log_type]}[{log_type}] in {func} - {message}{color['END']}'
 
     print(log_result)
     return True

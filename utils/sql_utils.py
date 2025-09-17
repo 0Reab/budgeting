@@ -76,16 +76,20 @@ def delete():
 
         if check == 'y':
             cursor.execute("DELETE FROM expenses")
-            log('success', 'delete()', 'SQL database wipe')
+            log('ok', 'delete()', 'SQL database wipe')
             return True
         else:
             log('info', 'delete()', 'SQL delete query aborted')
             return 'abort delete'
     else:
-        cursor.execute(f"DELETE FROM expenses WHERE id = (?)", (user_input))
+        try:
+            cursor.execute(f"DELETE FROM expenses WHERE id = (?)", (user_input))
+        except sqlite3.ProgrammingError as e:
+            log('fail', 'delete()', f'sql query error with {user_input} - {e}')
+            return None
 
     conn.commit()
-    log('success', 'delete()', 'SQL deleted entry')
+    log('ok', 'delete()', 'SQL deleted entry')
 
     return True
 
@@ -94,14 +98,15 @@ def show_db():
     cursor.execute("SELECT * FROM expenses")
     db = cursor.fetchall()
 
-    log('info', 'show_db()', 'SQL print db')
+    log('ok', 'show_db()', 'SQL print db')
 
     for entry in db:
         print(f'ID - {entry[0]} | categ - {entry[1]} | name - {entry[2]} | total - {entry[3]} | qty - {entry[4]} | date - {entry[5]}')
 
 
 def show_categories():
-    log('info', 'show_categories()', 'DB categories')
+    log('ok', 'show_categories()', 'DB categories')
+    print()
 
     for idx, cat in enumerate(categories):
         print(f'{cat} - {idx}')
