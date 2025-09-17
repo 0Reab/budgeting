@@ -16,15 +16,19 @@ def todays_date():
 
 def in_categories(test):
     try:
-        log('ok', 'in_categories()', 'validation')
-        return categories[int(test)]
+        idx = int(test)
+
+        if len(categories) <= idx:
+            log('fail', 'in_categories()', f'validate {test}, categories[{idx}] out of range')
+            return None
+
+        return categories[idx]
 
     except (TypeError, ValueError):
         if test in categories:
-            log('ok', 'in_categories()', 'validation')
             return test
 
-        log('fail', 'in_categories()', 'validation')
+        log('fail', 'in_categories()', f'validate {test}')
         return None
 
 
@@ -33,7 +37,7 @@ def validate(category, name, price, amount, date) -> bool:
 
     # return True for successful validation otherwise False
     try:
-        if in_categories(category) is None:
+        if in_categories(category) == None:
             log_fail('Failed category check')
             return False
 

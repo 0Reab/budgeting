@@ -40,19 +40,20 @@ def image_scan():
 
 
 def choose_category(item): # bug 1.
-    user_categ = None
+    #user_categ = None
 
-    while not in_categories(user_categ):
+    #while not in_categories(user_categ):
+    while True:
         show_categories()
         print(item, '\n', '-'*50)
+        
         choice = input('Select category: ')
         user_categ = in_categories(choice)
 
         #print(type(in_categories(user_categ)), in_categories(user_categ), 'debug 1')
-        if user_categ is None:
-            print(f"Invalid choice {choice}")
 
-    return user_categ
+        if user_categ is not None:
+            return user_categ
 
 
 def manual_entry():
