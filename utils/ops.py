@@ -25,8 +25,8 @@ def extract_and_insert(data: dict):
         log('fail', 'extract_and_insert()', f'generic exception clause - {e}')
 
 
-def image_scan():
-    img = parse_image_path() # should validate return of this func for file ext...
+def image_scan(img_path):
+    img = parse_image_path(img_path) # should validate return of this func for file ext...
 
     url = scan(img)
     data = fetch(url)
@@ -40,20 +40,15 @@ def image_scan():
 
 
 def choose_category(item): # bug 1.
-    #user_categ = None
-
-    #while not in_categories(user_categ):
     while True:
-        show_categories()
+        # show_categories() # TEMPORARY
         print(item, '\n', '-'*50)
         
-        choice = input('Select category: ')
+        choice = 'other' # input('Select category: ') # TEMPORARY
         user_categ = in_categories(choice)
 
-        #print(type(in_categories(user_categ)), in_categories(user_categ), 'debug 1')
-
         if user_categ is not None:
-            log('ok', 'choose_category()', f'user input {item}')
+            log('ok', 'choose_category()', f'categ {choice} for item -> {item}')
             return user_categ
 
 

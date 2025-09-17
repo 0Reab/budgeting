@@ -4,10 +4,12 @@ from datetime import datetime
 from utils.logger import log
 
 
-conn = sqlite3.connect("budget.db")
-cursor = conn.cursor()
-
 categories = ['other', 'tool', 'food', 'transport', 'bill', 'cosmetic', 'nightout','hobby']
+
+
+def sql():
+    conn = sqlite3.connect("budget.db", check_same_thread=False)
+    return conn, conn.cursor()
 
 
 def todays_date():
@@ -58,6 +60,8 @@ def validate(category, name, price, amount, date) -> bool:
 
 
 def insert(category, name, price, amount, date):
+    conn, cursor = sql()
+
     cursor.execute("INSERT INTO expenses (category, name, price, amount, date) VALUES (?, ?, ?, ?, ?)",
         (category, name, price, amount, date))
 
@@ -68,6 +72,7 @@ def insert(category, name, price, amount, date):
 
 
 def delete():
+    conn, cursor = sql()
     user_input = input(f'Select ID number to delete an entry: ')
 
     if user_input == '*':
@@ -105,6 +110,7 @@ def delete():
 
 
 def show_db():
+    conn, cursor = sql()
     cursor.execute("SELECT * FROM expenses")
     db = cursor.fetchall()
 
@@ -123,6 +129,8 @@ def show_categories():
 
 
 def con_close():
+    # peak programming right here
+    conn, cursor = sql()
     conn.close()
 
     log('info', 'con_close()', 'closing connection')

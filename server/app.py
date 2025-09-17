@@ -54,6 +54,8 @@ def upload():
             
             filepath = f'{img_path}/{filename}'
             image_scan(filepath)
+            print('Show database...')
+            show_db()
 
             return redirect('/')
 
