@@ -1,5 +1,6 @@
 from flask import Flask, render_template, request, flash, redirect, url_for
 from werkzeug.utils import secure_filename
+from utils.logger import log
 import os
 
 
@@ -37,6 +38,7 @@ def upload():
             return redirect('/')
 
         file = request.files['file']
+
         if file.filename == '':
             flash('No selected file')
             return redirect('/')
@@ -44,7 +46,8 @@ def upload():
         if file and allowed_file(file.filename):
             filename = secure_filename(file.filename)
             file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
-            print('LOG - FILE SAVED - OK')
+
+            log('ok', 'upload()', 'Image post request')
             return redirect('/')
 
     else:

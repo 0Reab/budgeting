@@ -5,16 +5,16 @@ from utils.ops import *
 
 
 
-def cmd():
-    execute = input('''
-        Enter a command:
-        exit = "Q"
-        QR image = "img"
-        del entry = "del"
-        show db = "get"
-        ''')
+def cmd(exec):
+    #execute = input('''
+    #    Enter a command:
+    #    exit = "Q"
+    #    QR image = "img"
+    #    del entry = "del"
+    #    show db = "get"
+    #    ''')
 
-    match execute:
+    match exec:
         case 'q': con_close()
         case 'img': image_scan()
         case 'del': delete()
