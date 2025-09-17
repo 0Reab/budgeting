@@ -1,11 +1,7 @@
 budget.db
 receipt1.jpg
 .vscode/settings.json
-__pycache__/ops.cpython-313.pyc
-__pycache__/parse.cpython-313.pyc
-__pycache__/scanner.cpython-313.pyc
-__pycache__/sql_utils.cpython-313.pyc
-utils/__pycache__/__init__.cpython-313.pyc
-utils/__pycache__/logger.cpython-313.pyc
-tests/__pycache__/log_test.cpython-313.pyc
-tests/__pycache__/__init__.cpython-313.pyc
+__pycache__/
+utils/__pycache__/
+tests/__pycache__/
+budget.db-journal

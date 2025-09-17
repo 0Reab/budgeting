@@ -71,8 +71,9 @@ def delete():
         check = input('Delete everything? y/n: ')
 
         if check == 'y':
+            cursor.execute("DELETE FROM expenses")
             log('success', 'delete()', 'SQL database wipe')
-            cursor.execute(f"DELETE * FROM expenses", (user_input))
+            return True
         else:
             log('info', 'delete()', 'SQL delete query aborted')
             return 'abort delete'
