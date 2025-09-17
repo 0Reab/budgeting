@@ -1,6 +1,7 @@
 from flask import Flask, render_template, request, flash, redirect, url_for
 from werkzeug.utils import secure_filename
 from utils.logger import log
+from backend import *
 import os
 
 
@@ -45,12 +46,19 @@ def upload():
 
         if file and allowed_file(file.filename):
             filename = secure_filename(file.filename)
-            file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
+            img_path = app.config['UPLOAD_FOLDER']
+
+            file.save(os.path.join(img_path, filename))
 
             log('ok', 'upload()', 'Image post request')
+            
+            filepath = f'{img_path}/{filename}'
+            image_scan(filepath)
+
             return redirect('/')
 
     else:
+        log('fail', 'upload()', 'Image post request')
         return render_template('home_error.html')
 
 
