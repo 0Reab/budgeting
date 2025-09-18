@@ -30,6 +30,16 @@ def home():
         return render_template('home_error.html')
 
 
+@app.route('/saved', methods=['GET'])
+def saved():
+    if request.method == 'GET':
+        msg = 'All database entries.'
+        entries = show_db()
+        return render_template('home.html', db_result=entries, msg=msg)
+    else:
+        return render_template('home_error.html')
+
+
 @app.route('/upload', methods=['POST'])
 def upload():
     if request.method == 'POST':
@@ -55,9 +65,10 @@ def upload():
             filepath = f'{img_path}/{filename}'
             image_scan(filepath)
             print('Show database...')
-            show_db()
 
-            return redirect('/')
+            entries = show_db()
+
+            return render_template('home.html', db_result=entries, msg='Success')
 
     else:
         log('fail', 'upload()', 'Image post request')

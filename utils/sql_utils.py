@@ -113,11 +113,16 @@ def show_db():
     conn, cursor = sql()
     cursor.execute("SELECT * FROM expenses")
     db = cursor.fetchall()
+    result = []
 
     log('ok', 'show_db()', 'SQL print db')
 
     for entry in db:
-        print(f'ID - {entry[0]} | categ - {entry[1]} | name - {entry[2]} | total - {entry[3]} | qty - {entry[4]} | date - {entry[5]}')
+        line = f'ID - {entry[0]} | categ - {entry[1]} | name - {entry[2]} | total - {entry[3]} | qty - {entry[4]} | date - {entry[5]}'
+        result.append(line)
+        print(line)
+
+    return result
 
 
 def show_categories():

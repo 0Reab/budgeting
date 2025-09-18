@@ -45,6 +45,7 @@ def choose_category(item): # bug 1.
         print(item, '\n', '-'*50)
         
         choice = 'other' # input('Select category: ') # TEMPORARY
+        #choice = manual_entry()
         user_categ = in_categories(choice)
 
         if user_categ is not None:
