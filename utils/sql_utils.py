@@ -59,8 +59,9 @@ def validate(category, name, price, amount, date) -> bool:
     return True
 
 
-def insert(category, name, price, amount, date):
+def insert(i):
     conn, cursor = sql()
+    category, name, price, amount, date = i
 
     cursor.execute("INSERT INTO expenses (category, name, price, amount, date) VALUES (?, ?, ?, ?, ?)",
         (category, name, price, amount, date))

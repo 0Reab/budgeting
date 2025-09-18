@@ -37,7 +37,9 @@
       <p class="text">{{ entry }}</p>
 
       <div class="dropdown">
+        {% if edit %}
         <button type="button" class="dropbtn">Select category</button>
+        {% endif %}
         <div class="dropdown-content">
           {% for cat in categories %}
             <a href="#" data-cat="{{ cat }}">{{ cat }}</a>

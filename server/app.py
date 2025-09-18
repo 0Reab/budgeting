@@ -44,7 +44,15 @@ def saved():
 def categories_post():
     if request.method == 'POST':
         msg = 'Success :)'
-        print(request.form.getlist("categories[]"))
+        categs = request.form.getlist("categories[]")
+
+        print(categs)
+
+        for item in items:
+            item[0] = categs[0]
+            categs.pop(0)
+            insert(item)
+
         return render_template('home.html', msg=msg)
     else:
         return render_template('home_error.html')
@@ -73,6 +81,7 @@ def upload():
             log('ok', 'upload()', 'Image post request')
             
             filepath = f'{img_path}/{filename}'
+            global items
             items = image_scan(filepath)
 
 
