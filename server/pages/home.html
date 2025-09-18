@@ -8,18 +8,24 @@
     <title>Budgeting app</title>
   </head>
   <body>
-    <h1>Budgeting app</h1>
+    <h1 class="mc">Budgeting app</h1>
     <p>upload image here</p>
     <form action="/upload" method="post" enctype="multipart/form-data">
-      <input type="file" id="myFile" name="file">
-      <input type="submit" value="Upload">
+      <input class="ba" type="file" id="myFile" name="file">
+      <input class="ba" type="submit" value="Upload">
     </form>
     <script>
       function loadData() {
         window.location.href = "/saved" ;
       }
+
+      function goHome() {
+        document.location.href = "/" ;
+      }
+
+      document.querySelector('.mc').addEventListener('click', goHome) ;
     </script>
-    <button onclick="loadData()">View all entries</button>
+    <button class="ba" onclick="loadData()">View all entries</button>
     {% if msg %}
     <h3>{{ msg }}</h3>
     {% endif %}

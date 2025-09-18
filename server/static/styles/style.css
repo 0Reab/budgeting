@@ -1291,3 +1291,15 @@ details > * + * {
 
 /* !SECTION Page Layout */
 /* !SECTION Layout */
+
+.mc:active{
+transform: scale(1, 0.9);
+color:#2d3436;
+transition: transform 0.2s color 0.2s;
+}
+
+.ba:active{
+transform: scale(1, 0.9);
+color:#2d3436;
+transition: transform 0.2s color 0.2s;
+}
