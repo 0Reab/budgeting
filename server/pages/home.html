@@ -26,11 +26,47 @@
       document.querySelector('.mc').addEventListener('click', goHome) ;
     </script>
     <button class="ba" onclick="loadData()">View all entries</button>
-    {% if msg %}
-    <h3>{{ msg }}</h3>
-    {% endif %}
-    {% for entry in db_result %}
-    <p id="text">{{ entry }}</p>
-    {% endfor %}
+
+{% if msg %}
+  <h3>{{ msg }}</h3>
+{% endif %}
+
+<form id="categories-form" method="POST" action="/categories">
+  {% for entry in db_result %}
+    <div class="entry-row" style="display: flex; gap: 10px; align-items: center; margin-bottom: 8px;">
+      <p class="text">{{ entry }}</p>
+
+      <div class="dropdown">
+        <button type="button" class="dropbtn">Select category</button>
+        <div class="dropdown-content">
+          {% for cat in categories %}
+            <a href="#" data-cat="{{ cat }}">{{ cat }}</a>
+          {% endfor %}
+        </div>
+      </div>
+
+      <!-- hidden input to actually send with the form -->
+      <input type="hidden" name="categories[]" value="">
+    </div>
+  {% endfor %}
+  {% if edit %}
+  <button type="submit">Send</button>
+  {% endif %}
+</form>
+<script>
+document.querySelectorAll('.dropdown').forEach(dropdown => {
+  const button = dropdown.querySelector('.dropbtn');
+  const hiddenInput = dropdown.parentElement.querySelector('input[type="hidden"]');
+
+  dropdown.querySelectorAll('.dropdown-content a').forEach(option => {
+    option.addEventListener('click', e => {
+      e.preventDefault();
+      const category = option.dataset.cat;
+      button.textContent = category;
+      hiddenInput.value = category;
+    });
+  });
+});
+</script>
   </body>
 </html>

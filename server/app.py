@@ -40,6 +40,16 @@ def saved():
         return render_template('home_error.html')
 
 
+@app.route('/categories', methods=['POST'])
+def categories_post():
+    if request.method == 'POST':
+        msg = 'Success :)'
+        print(request.form.getlist("categories[]"))
+        return render_template('home.html', msg=msg)
+    else:
+        return render_template('home_error.html')
+
+
 @app.route('/upload', methods=['POST'])
 def upload():
     if request.method == 'POST':
@@ -68,7 +78,7 @@ def upload():
 
             print('Show database...')
 
-            return render_template('home.html', db_result=items, msg='Success')
+            return render_template('home.html', db_result=items, msg='Success', edit='yes', categories=categories)
 
     else:
         log('fail', 'upload()', 'Image post request')

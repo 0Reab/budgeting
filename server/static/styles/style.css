@@ -1303,3 +1303,34 @@ transform: scale(1, 0.9);
 color:#2d3436;
 transition: transform 0.2s color 0.2s;
 }
+
+.dropdown {
+  position: relative;
+  display: inline-block;
+}
+.dropbtn {
+  padding: 6px 12px;
+  border: 1px solid #ccc;
+  background: #f5f5f5;
+  cursor: pointer;
+}
+.dropdown-content {
+  display: none;
+  position: absolute;
+  background: white;
+  border: 1px solid #ddd;
+  min-width: 160px;
+  z-index: 1;
+}
+.dropdown-content a {
+  display: block;
+  padding: 6px 12px;
+  text-decoration: none;
+  color: black;
+}
+.dropdown-content a:hover {
+  background: #eee;
+}
+.dropdown:hover .dropdown-content {
+  display: block;
+}
