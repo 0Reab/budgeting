@@ -5,20 +5,25 @@ from utils.parse import *
 
 
 
-def extract_and_insert(data: dict):
+def extract(item):
     try:
-        amount = int(data['qty'])
-        name = data['name']
-        price = float(data['total'].replace('.', '').replace(',','.'))
+        result = []
 
-        category = choose_category(item=name)
-        date = todays_date()
+        for data in item:
+            amount = int(data['qty'])
+            name = data['name']
+            price = float(data['total'].replace('.', '').replace(',','.'))
 
-        if not validate(category, name, price, amount, date):
-            return False
+            category = choose_category(item=name)
+            date = todays_date()
 
-        log('ok', 'extract_and_insert()', 'data extraction')
-        return insert(category, name, price, amount, date)
+            if not validate(category, name, price, amount, date):
+                return False
+
+            result.append([category, name, price, amount, date])
+        log('ok', 'extract()', 'data extraction')
+
+        return result
 
 
     except Exception as e:
@@ -30,13 +35,15 @@ def image_scan(img_path):
 
     url = scan(img)
     data = fetch(url)
-    result = parse(data)
+    raw = parse(data)
+    result = extract(raw)
 
-    for line_data in result:
-        extract_and_insert(line_data)
+    #for line_data in result:
+    #    extract_and_insert(line_data)
 
     log('ok', 'image_scan()', 'xd')
-    return True
+
+    return result
 
 
 def choose_category(item): # bug 1.

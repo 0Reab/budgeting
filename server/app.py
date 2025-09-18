@@ -63,12 +63,12 @@ def upload():
             log('ok', 'upload()', 'Image post request')
             
             filepath = f'{img_path}/{filename}'
-            image_scan(filepath)
+            items = image_scan(filepath)
+
+
             print('Show database...')
 
-            entries = show_db()
-
-            return render_template('home.html', db_result=entries, msg='Success')
+            return render_template('home.html', db_result=items, msg='Success')
 
     else:
         log('fail', 'upload()', 'Image post request')

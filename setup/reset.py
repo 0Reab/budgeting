@@ -9,7 +9,6 @@ def user_confirm():
     answer = input('Are you sure you want delete the database?: y/n')
 
     if answer == 'y':
-        log('info', 'user_confirm()', 'deleting the database')
         return 'delete'
     else:
         print('[INFO] abort db deletion... exiting')
@@ -44,4 +43,4 @@ def reset():
 
     c.close()
 
-#reset()
+reset()
