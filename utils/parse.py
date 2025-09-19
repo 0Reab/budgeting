@@ -19,11 +19,28 @@ def fetch(url):
     return response
 
 
+def get_date(txt):
+
+    for ln in txt.split('\n'):
+        if 'vreme:' in ln or 'време:' in ln:
+            date = ln.split()[-2]
+
+            log('ok', 'get_date()', f'found date = {date}')
+            return date 
+
+    log('fail', 'get_date()', 'did not find date')
+    return None
+
+
 def parse(response):
     delimiter = '=' * 40
     response = str(response)
     raw = ''.join(response.split(delimiter)[1])
-    #print(raw)
+
+    date = get_date(response)
+
+    if not date:
+        return None
 
     try:
         lines = [l.strip() for l in raw.splitlines() if l.strip()]
@@ -39,11 +56,14 @@ def parse(response):
                     "name": " ".join(current_name),
                     "price": price,
                     "qty": qty,
-                    "total": total
+                    "total": total,
+                    "date": date
                 })
                 current_name = []  # reset for next item
             elif not line.startswith("Назив") and "износ" not in line and "Платна" not in line:
                 current_name.append(line)
+
+
 
     except Exception as e:
         log('fail', 'parse()', f'html soupe parser failed, good luck - {e}')

@@ -14,10 +14,10 @@ def extract(item):
             amount = int(data['qty'])
             price = float(data['total'].replace('.', '').replace(',','.'))
             name = data['name']
+            date = data['date']
 
-            date = todays_date() # replace with date from receipt
-
-            if not validate(category, name, price, amount, date):
+            if validate(category, name, price, amount, date) == False:
+                log('fail', 'extract()', 'data validation')
                 return False
 
             result.append([category, name, price, amount, date])
@@ -26,7 +26,7 @@ def extract(item):
         return result
 
     except Exception as e:
-        log('fail', 'extract_and_insert()', f'generic exception clause - {e}')
+        log('fail', 'extract()', f'generic exception clause - {e}')
         return None
 
 

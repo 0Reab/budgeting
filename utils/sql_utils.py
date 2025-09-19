@@ -12,10 +12,6 @@ def sql():
     return conn, conn.cursor()
 
 
-def todays_date():
-    return datetime.today().strftime(r'%d-%m-%Y')
-
-
 def in_categories(test):
     try:
         idx = int(test)
@@ -47,7 +43,7 @@ def validate(category, name, price, amount, date) -> bool:
             log_fail(f'Failed price or amount price={price} ; amount={amount}')
             return False
 
-        if len(name) > 100 or len(date) != 10:
+        if len(name) > 100 or len(date) != 11:
             log_fail(f'Failed name or date name={name} ; date={date}')
             return False
 
