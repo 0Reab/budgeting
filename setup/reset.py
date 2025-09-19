@@ -43,4 +43,4 @@ def reset():
 
     c.close()
 
-reset()
+#reset()

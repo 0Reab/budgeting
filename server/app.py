@@ -45,23 +45,22 @@ def saved():
 def categories_post():
     if request.method == 'POST':
         global items
-        err_msg = "Error, you have already tracked these items."
+        err_msg = "Error in data insertion, try again."
         err_status = 400
 
         user_categs = request.form.getlist("categories[]")
         msg = 'Success :)'
 
         def error():
-            log('fail', 'categories_post()', 'prevented bad insert')
-            return render_template('home.html', msg=err_msg), err_status
+            log('fail', 'categories_post()', f'invalid data in user_categs = {user_categs}')
+            return render_template('home.html', db_result=items, msg=err_msg, edit='yes', categories=categories)
+            #return render_template('home.html', msg=err_msg), err_status
 
         # prevent insert when item buffer is empty (global var)
         # or item tags length do not match with items
 
-        if not items or len(items) != len(user_categs):
+        if not items or len(items) != len(user_categs) or '' in user_categs:
             return error()
-
-        print(user_categs)
 
         for item in items:
             # update category with user input and insert in db
