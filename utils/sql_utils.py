@@ -30,7 +30,7 @@ def in_categories(test):
         if test in categories:
             return test
 
-        log('fail', 'in_categories()', f'validate {test}')
+        log('fail', 'in_categories()', f'validate {test} ; {type(test)}')
         return None
 
 
@@ -40,22 +40,22 @@ def validate(category, name, price, amount, date) -> bool:
     # return True for successful validation otherwise False
     try:
         if in_categories(category) == None:
-            log_fail('Failed category check')
+            log_fail(f'Failed category check {category}')
             return False
 
         if price <= 0 or amount <= 0:
-            log_fail('Failed price and amount')
+            log_fail(f'Failed price or amount price={price} ; amount={amount}')
             return False
 
         if len(name) > 100 or len(date) != 10:
-            log_fail('Failed name and date')
+            log_fail(f'Failed name or date name={name} ; date={date}')
             return False
 
     except Exception as e:
         log_fail(f'Other validation error - {e}')
         return False
 
-    log('ok', 'validate()', 'validation')
+    log('ok', 'validate()', f'{category} ; {name}')
     return True
 
 
@@ -71,7 +71,7 @@ def insert(i):
         (category, name, price, amount, date))
 
     conn.commit()
-    log('info', 'insert()', 'SQL insert query')
+    log('info', 'insert()', f'SQL -> {name}')
 
     return True
 
