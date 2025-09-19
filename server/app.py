@@ -9,6 +9,7 @@ app = Flask(__name__, template_folder='pages')
 
 ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg'}
 app.config['UPLOAD_FOLDER'] = os.path.join(app.root_path, 'images')
+items = []
 
 
 def read_key():
@@ -43,15 +44,32 @@ def saved():
 @app.route('/categories', methods=['POST'])
 def categories_post():
     if request.method == 'POST':
-        msg = 'Success :)'
-        categs = request.form.getlist("categories[]")
+        global items
+        err_msg = "Error, you have already tracked these items."
+        err_status = 400
 
-        print(categs)
+        user_categs = request.form.getlist("categories[]")
+        msg = 'Success :)'
+
+        def error(err_msg):
+            log('fail', 'categories_post()', 'prevented bad insert')
+            return render_template('home.html', msg=err_msg), err_status
+
+        # prevent insert when item buffer is empty (global var)
+        # or item tags length do not match with items
+
+        if not items or len(items) != len(user_categs):
+            return error()
+
+        print(user_categs)
 
         for item in items:
-            item[0] = categs[0]
-            categs.pop(0)
+            # update category with user input and insert in db
+            item[0] = user_categs[0] 
+            user_categs.pop(0) 
             insert(item)
+
+        items = [] # clear global buffer
 
         return render_template('home.html', msg=msg)
     else:

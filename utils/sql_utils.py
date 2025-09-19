@@ -63,6 +63,9 @@ def insert(i):
     conn, cursor = sql()
     category, name, price, amount, date = i
 
+    if validate(category, name, price, amount, date) is not True:
+        return False
+
     cursor.execute("INSERT INTO expenses (category, name, price, amount, date) VALUES (?, ?, ?, ?, ?)",
         (category, name, price, amount, date))
 
