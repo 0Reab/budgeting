@@ -1,8 +1,5 @@
 # features to implement - ordered
 
-- improve logging, messages not specific enough
-- change date() to actual receipt date
-- refactor god awful upload() in app.py - too much going on in on func
 - complete duplicate entry check and reject insertion.
 - uploaded image duplicate detection and rejection - checksum?
 - tests for all functions - gotta do em
@@ -18,11 +15,7 @@
 - proper pentest after all is completed - sqli, rce, lfi, xss...
 - change to WSGI server
 
-
 # known bugs
-
-if you only select categories for some items, they will be inserted and others will fail insertion
-obsolete functions in backed (ops.py)
 
 # run 
 python -m server.app

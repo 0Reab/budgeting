@@ -6,7 +6,6 @@ from utils.logger import log
 
 categories = ['other', 'tool', 'food', 'transport', 'bill', 'cosmetic', 'nightout','hobby']
 
-
 def sql():
     conn = sqlite3.connect("budget.db", check_same_thread=False)
     return conn, conn.cursor()
