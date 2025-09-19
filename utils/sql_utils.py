@@ -64,6 +64,7 @@ def insert(i):
     category, name, price, amount, date = i
 
     if validate(category, name, price, amount, date) is not True:
+        log('fail', 'insert()', 'SQL insert query validation')
         return False
 
     cursor.execute("INSERT INTO expenses (category, name, price, amount, date) VALUES (?, ?, ?, ?, ?)",
@@ -124,7 +125,6 @@ def show_db():
     for entry in db:
         line = f'ID - {entry[0]} | categ - {entry[1]} | name - {entry[2]} | total - {entry[3]} | qty - {entry[4]} | date - {entry[5]}'
         result.append(line)
-        print(line)
 
     return result
 

@@ -1,5 +1,6 @@
 # features to implement - ordered
 
+- improve logging, messages not specific enough
 - change date() to actual receipt date
 - refactor god awful upload() in app.py - too much going on in on func
 - complete duplicate entry check and reject insertion.
@@ -20,7 +21,8 @@
 
 # known bugs
 
-all known fixed at the moment
+if you only select categories for some items, they will be inserted and others will fail insertion
+obsolete functions in backed (ops.py)
 
 # run 
 python -m server.app

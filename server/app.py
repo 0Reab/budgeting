@@ -51,7 +51,7 @@ def categories_post():
         user_categs = request.form.getlist("categories[]")
         msg = 'Success :)'
 
-        def error(err_msg):
+        def error():
             log('fail', 'categories_post()', 'prevented bad insert')
             return render_template('home.html', msg=err_msg), err_status
 
@@ -91,26 +91,25 @@ def upload():
             return redirect('/')
 
         if file and allowed_file(file.filename):
-            filename = secure_filename(file.filename)
-            img_path = app.config['UPLOAD_FOLDER']
-
-            file.save(os.path.join(img_path, filename))
-
-            log('ok', 'upload()', 'Image post request')
-            
-            filepath = f'{img_path}/{filename}'
-            global items
-            items = image_scan(filepath)
-
-
-            print('Show database...')
-
-            return render_template('home.html', db_result=items, msg='Success', edit='yes', categories=categories)
-
+            return run_backend(file)
     else:
         log('fail', 'upload()', 'Image post request')
         return render_template('home_error.html')
 
+
+def run_backend(file):
+    filename = secure_filename(file.filename)
+    img_path = app.config['UPLOAD_FOLDER']
+
+    file.save(os.path.join(img_path, filename))
+
+    log('ok', 'upload()', 'Image post request')
+    
+    filepath = f'{img_path}/{filename}'
+    global items
+    items = image_scan(filepath)
+
+    return render_template('home.html', db_result=items, msg='Success', edit='yes', categories=categories)
 
 
 if __name__ == '__main__':
