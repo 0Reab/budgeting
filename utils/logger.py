@@ -1,6 +1,12 @@
 
+""" Module for custom logging of application operations and errors """
+# implement saving logs to a file
+
 
 def log(log_type, func, message):
+    """ main logging func - formatted and colored print: args -> function calls with log type and custom messages"""
+    # "func" argument is a hardcoded string which can be inaccurate if actual func name is changed. 
+    # for eg. log('ok', 'parser()', 'parsing of text') is bad if parser() was renamed into parsing_text().
 
     if not validate_call(log_type, message):
         return None
@@ -22,8 +28,8 @@ def log(log_type, func, message):
     return True
 
 
-def validate_call(log_type, message):
-    # quick func call validation
+def validate_call(log_type, message) -> bool:
+    """ log() argument validation """
 
     bad_call = f'Invalid log type for: {log_type} :with message: {message}'
 
@@ -44,5 +50,3 @@ def validate_call(log_type, message):
         return None
 
     return True
-
-# implement saving logs to a file

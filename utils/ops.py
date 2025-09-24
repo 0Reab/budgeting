@@ -4,8 +4,12 @@ from utils.logger import *
 from utils.parse import *
 
 
+""" Module for last steps in receipt processing 'extract()'. And wrapper func for server to call 'image_scan()' """
+
 
 def extract(item):
+    """ data extraction of receipt of parsed receipt """
+
     try:
         result = []
 
@@ -31,6 +35,8 @@ def extract(item):
 
 
 def image_scan(img_path):
+    """ wrapper for the whole backedend image processing and data parsing """
+
     img = parse_image_path(img_path) # should validate return of this func for file ext...
 
     url = scan(img)

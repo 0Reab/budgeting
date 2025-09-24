@@ -1,6 +1,9 @@
 from utils.parse import *
 
 
+""" Tests for parsing functions """
+
+
 def test_fetch():
     fuzz_url = []
 

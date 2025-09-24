@@ -1,6 +1,9 @@
 from utils.logger import log
 
 
+""" Tests for logging function """
+
+
 log_levels = [
      'INFO', 'ERROR', 'CRITICAL', 'OK', 'FAIL' 
 ]

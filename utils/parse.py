@@ -4,8 +4,12 @@ import requests
 import re
 
 
+""" Module for HTTP requests, HTML response parsing, extracting of data """
 
-def fetch(url):
+
+def fetch(url) -> str:
+    """ HTTP GET url from QR image scan -> BeautifulSoup finds <pre> tags -> return string of tags """
+
     try:
         result = requests.get(url).content
     except Exception as e:
@@ -19,7 +23,8 @@ def fetch(url):
     return response
 
 
-def get_date(txt):
+def get_date(txt) -> str:
+    """ parse receipt in text form to find date of issue """
 
     for ln in txt.split('\n'):
         if 'vreme:' in ln or 'време:' in ln:
@@ -32,7 +37,10 @@ def get_date(txt):
     return None
 
 
-def parse(response):
+def parse(response) -> list[dict[str, str]]:
+    """ parse receipt in text form to extract bought items and other info """
+    # maybe refactor into two func, parse() and regex with items as return?
+
     delimiter = '=' * 40
     response = str(response)
     raw = ''.join(response.split(delimiter)[1])
@@ -72,8 +80,9 @@ def parse(response):
     return items
 
 
-def parse_image_path(img):
-    # for now just image name in $pwd
+def parse_image_path(img: str) -> str:
+    """ validate file extension to a whitelist of allowed """
+    # needs more validation and and maybe error handling
 
     img_ext = img.split('.')[-1]
     allowed_ext = ['jpg', 'png']

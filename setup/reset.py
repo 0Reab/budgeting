@@ -2,10 +2,13 @@ import sqlite3
 import os
 from logging import log
 
-
-#categories = ['other', 'tool', 'food', 'transport', 'bill', 'cosmetic', 'nightout','hobby']
+""" Script for debugging / testing - delete DB and create new, with the same table structure """
 
 def user_confirm():
+    """ confirmed only if user input is 'y'
+    return 'delete' upon success
+    """
+
     answer = input('Are you sure you want delete the database?: y/n')
 
     if answer == 'y':
@@ -16,11 +19,15 @@ def user_confirm():
 
 
 def delete_db():
+    """ delete database file """
+
     os.remove('budget.db')
     print('[OK] database deleted')
 
 
 def reset():
+    """ main - wrapper for functions """
+
     if user_confirm() == 'delete':
         delete_db()
 

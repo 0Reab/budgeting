@@ -4,14 +4,22 @@ from datetime import datetime
 from utils.logger import log
 
 
+""" Module for: SQL queries, utilities, validation, formmated prints, DB connection object """
+
+
 categories = ['other', 'tool', 'food', 'transport', 'bill', 'cosmetic', 'nightout','hobby']
 
+
 def sql():
+    """ create cursor and SQL DB connection """
+
     conn = sqlite3.connect("budget.db", check_same_thread=False)
     return conn, conn.cursor()
 
 
-def in_categories(test):
+def in_categories(test) -> bool:
+    """ Validation - if arg is in whitelist of array categories """
+
     try:
         idx = int(test)
 
@@ -30,9 +38,13 @@ def in_categories(test):
 
 
 def validate(category, name, price, amount, date) -> bool:
+    """
+    Main validation func of all insert(i) parameters
+    return True for successful validation otherwise False
+    """
+
     log_fail = lambda msg: log('fail', 'validate()', msg) 
 
-    # return True for successful validation otherwise False
     try:
         if in_categories(category) == None:
             log_fail(f'Failed category check {category}')
@@ -55,6 +67,8 @@ def validate(category, name, price, amount, date) -> bool:
 
 
 def insert(i):
+    """ add entry to DB table with last validation step """
+
     conn, cursor = sql()
     category, name, price, amount, date = i
 
@@ -72,6 +86,10 @@ def insert(i):
 
 
 def delete():
+    """ delete DB table entry by ID or wildcard """
+    # needs refactoring from CLI to Web app operations
+    # could refactor into two functions, validation and delete.
+
     conn, cursor = sql()
     user_input = input(f'Select ID number to delete an entry: ')
 
@@ -110,6 +128,8 @@ def delete():
 
 
 def show_db():
+    """ formatted print of all table entries to stdout """
+
     conn, cursor = sql()
     cursor.execute("SELECT * FROM expenses")
     db = cursor.fetchall()
@@ -125,6 +145,8 @@ def show_db():
 
 
 def show_categories():
+    """ print global categories to stdout """
+
     log('ok', 'show_categories()', 'DB categories')
     print()
 
@@ -133,7 +155,9 @@ def show_categories():
 
 
 def con_close():
-    # peak programming right here
+    """ SQL connection closing """
+    # need to learn when and if this is needed 
+
     conn, cursor = sql()
     conn.close()
 
