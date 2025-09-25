@@ -8,7 +8,7 @@ import cv2
 qreader = QReader()
 
 
-def scan(image_path) -> str:
+def scan(image_path: str) -> str:
     """ return URL from QR code in the image """
     # needs error handling and/or test?
 
@@ -17,4 +17,5 @@ def scan(image_path) -> str:
 
     log('ok', f'scan({image_path})', 'QR code scanned')
     log('ok', f'scan()', f'url = {decoded_text}')
+
     return decoded_text[0]

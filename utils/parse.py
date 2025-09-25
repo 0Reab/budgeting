@@ -7,7 +7,7 @@ import re
 """ Module for HTTP requests, HTML response parsing, extracting of data """
 
 
-def fetch(url) -> str:
+def fetch(url) -> str | None:
     """ HTTP GET url from QR image scan -> BeautifulSoup finds <pre> tags -> return string of tags """
 
     try:
@@ -23,7 +23,7 @@ def fetch(url) -> str:
     return response
 
 
-def get_date(txt) -> str:
+def get_date(txt: str) -> str | None:
     """ parse receipt in text form to find date of issue """
 
     for ln in txt.split('\n'):
@@ -37,7 +37,7 @@ def get_date(txt) -> str:
     return None
 
 
-def parse(response) -> list[dict[str, str]]:
+def parse(response: str) -> list[dict[str, str]] | None:
     """ parse receipt in text form to extract bought items and other info """
     # maybe refactor into two func, parse() and regex with items as return?
 
@@ -80,7 +80,7 @@ def parse(response) -> list[dict[str, str]]:
     return items
 
 
-def parse_image_path(img: str) -> str:
+def parse_image_path(img: str) -> str | bool:
     """ validate file extension to a whitelist of allowed """
     # needs more validation and and maybe error handling
 

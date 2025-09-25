@@ -10,14 +10,14 @@ from utils.logger import log
 categories = ['other', 'tool', 'food', 'transport', 'bill', 'cosmetic', 'nightout','hobby']
 
 
-def sql():
+def sql() -> tuple:
     """ create cursor and SQL DB connection """
 
     conn = sqlite3.connect("budget.db", check_same_thread=False)
     return conn, conn.cursor()
 
 
-def in_categories(test) -> bool:
+def in_categories(test) -> str | None:
     """ Validation - if arg is in whitelist of array categories """
 
     try:
@@ -37,7 +37,7 @@ def in_categories(test) -> bool:
         return None
 
 
-def validate(category, name, price, amount, date) -> bool:
+def validate(category: str, name: str, price: float, amount: int, date: str) -> bool:
     """
     Main validation func of all insert(i) parameters
     return True for successful validation otherwise False
@@ -66,7 +66,7 @@ def validate(category, name, price, amount, date) -> bool:
     return True
 
 
-def insert(i):
+def insert(i: list) -> bool:
     """ add entry to DB table with last validation step """
 
     conn, cursor = sql()
@@ -85,7 +85,7 @@ def insert(i):
     return True
 
 
-def delete():
+def delete() -> bool | None:
     """ delete DB table entry by ID or wildcard """
     # needs refactoring from CLI to Web app operations
     # could refactor into two functions, validation and delete.
@@ -127,7 +127,7 @@ def delete():
     return True
 
 
-def show_db():
+def show_db() -> list:
     """ formatted print of all table entries to stdout """
 
     conn, cursor = sql()
@@ -144,7 +144,7 @@ def show_db():
     return result
 
 
-def show_categories():
+def show_categories() -> None:
     """ print global categories to stdout """
 
     log('ok', 'show_categories()', 'DB categories')

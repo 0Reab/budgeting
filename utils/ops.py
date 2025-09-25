@@ -7,7 +7,7 @@ from utils.parse import *
 """ Module for last steps in receipt processing 'extract()'. And wrapper func for server to call 'image_scan()' """
 
 
-def extract(item):
+def extract(item) -> list | None:
     """ data extraction of receipt of parsed receipt """
 
     try:
@@ -22,7 +22,7 @@ def extract(item):
 
             if validate(category, name, price, amount, date) == False:
                 log('fail', 'extract()', 'data validation')
-                return False
+                return None 
 
             result.append([category, name, price, amount, date])
 
@@ -34,8 +34,9 @@ def extract(item):
         return None
 
 
-def image_scan(img_path):
+def image_scan(img_path: str) -> list:
     """ wrapper for the whole backedend image processing and data parsing """
+    # not robust enough, no validation & err handling
 
     img = parse_image_path(img_path) # should validate return of this func for file ext...
 
