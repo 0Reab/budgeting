@@ -14,6 +14,11 @@
 # security
 - proper pentest after all is completed - sqli, rce, lfi, xss...
 - change to WSGI server
+- track processed images buy checksum value in a list, and don't keep images stored after processing
+- cookie based session - one time login - good practices
+- possible xss vector - receipt item name = payload, victim views tracked items = execution
+- possible ssrf - malicious qr code URL - makes the server visit any URL !
+
 
 # known bugs
 

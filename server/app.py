@@ -13,12 +13,14 @@ items = []
 
 
 def read_key():
+    """ read flask key from file """
     with open('key.txt', 'r') as f:
         key = f.read()
     return key
 
 
 def allowed_file(filename):
+    """ file extension validation """
     return '.' in filename and \
         filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
 
@@ -33,6 +35,8 @@ def home():
 
 @app.route('/saved', methods=['GET'])
 def saved():
+    """ display DB entries """
+
     if request.method == 'GET':
         msg = 'All database entries.'
         entries = show_db()
@@ -43,6 +47,8 @@ def saved():
 
 @app.route('/categories', methods=['POST'])
 def categories_post():
+    """ parse user selected categories from POST data to annotate global 'items' SQL query """
+
     if request.method == 'POST':
         global items
         err_msg = "Error in data insertion, try again."
@@ -77,6 +83,8 @@ def categories_post():
 
 @app.route('/upload', methods=['POST'])
 def upload():
+    """ image upload endpoint with processing """
+
     if request.method == 'POST':
 
         if 'file' not in request.files:
@@ -97,6 +105,8 @@ def upload():
 
 
 def run_backend(file):
+    """ image processing and calling backend processor """
+
     filename = secure_filename(file.filename)
     img_path = app.config['UPLOAD_FOLDER']
 
