@@ -7,8 +7,32 @@ import re
 """ Module for HTTP requests, HTML response parsing, extracting of data """
 
 
-def fetch(url) -> str | None:
-    """ HTTP GET url from QR image scan -> BeautifulSoup finds <pre> tags -> return string of tags """
+def validate_url(url: str) -> bool:
+    """ origin and http parameter validation """
+    # add more validation for http parameter part of the url 
+
+    valid = 'https://suf.purs.gov.rs/v/?vl='
+    xss_strings = r';%3B<>%3C%3E'
+
+    if not url.startswith(valid):
+        log('fail', 'validate_url()', f'Invalid url: {url}')
+        return False
+    
+    for char in url:
+        if char in xss_strings:
+            log('fail', 'validate_url()', f'XSS strings found in: {url}')
+            return False
+
+    log('ok', 'validate_url()', f'url validated: {url}')
+    return True
+
+
+def fetch(url: str) -> str | None:
+    """ HTTP GET url response -> BeautifulSoup finds <pre> tags -> return string of tag values """
+
+    if not validate_url(url):
+        log('fail', 'fetch()', f'failed vaildation')
+        return None
 
     try:
         result = requests.get(url).content
