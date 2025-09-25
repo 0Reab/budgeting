@@ -59,8 +59,7 @@ def categories_post():
 
         def error():
             log('fail', 'categories_post()', f'invalid data in user_categs = {user_categs}')
-            return render_template('home.html', db_result=items, msg=err_msg, edit='yes', categories=categories)
-            #return render_template('home.html', msg=err_msg), err_status
+            return render_template('home.html', db_result=items, msg=err_msg, edit='yes', categories=categories), err_status
 
         # prevent insert when item buffer is empty (global var)
         # or item tags length do not match with items

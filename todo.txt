@@ -18,6 +18,7 @@
 - cookie based session - one time login - good practices
 - possible xss vector - receipt item name = payload, victim views tracked items = execution
 - possible ssrf - malicious qr code URL - makes the server visit any URL !
+- check path traversal regex in image path validation
 
 
 # known bugs

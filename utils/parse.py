@@ -37,25 +37,12 @@ def get_date(txt: str) -> str | None:
     return None
 
 
-def parse(response: str) -> list[dict[str, str]] | None:
-    """ parse receipt in text form to extract bought items and other info """
-    # maybe refactor into two func, parse() and regex with items as return?
+def receit_regex(lines: list, date: str) -> list:
+    """ receit ascii regex parser for bought items """
 
-    delimiter = '=' * 40
-    response = str(response)
-    raw = ''.join(response.split(delimiter)[1])
-
-    date = get_date(response)
-
-    if not date:
-        return None
-
-    try:
-        lines = [l.strip() for l in raw.splitlines() if l.strip()]
-
-        items, current_name = [], []
-
-        for line in lines:
+    items, current_name = [], []
+    
+    for line in lines:
             # Match rows that look like "price qty total"
             if re.match(r'^[\d\., ]+\d$', line):
                 parts = line.split()
@@ -70,8 +57,25 @@ def parse(response: str) -> list[dict[str, str]] | None:
                 current_name = []  # reset for next item
             elif not line.startswith("Назив") and "износ" not in line and "Платна" not in line:
                 current_name.append(line)
+    
+    return items
 
 
+def parse(response: str) -> list[dict[str, str]] | None:
+    """ parse receipt in text form to extract bought items and other info """
+
+    delimiter = '=' * 40
+    response = str(response)
+    raw = ''.join(response.split(delimiter)[1])
+
+    date = get_date(response)
+
+    if not date:
+        return None
+
+    try:
+        lines = [l.strip() for l in raw.splitlines() if l.strip()]
+        items = receit_regex(lines, date)
 
     except Exception as e:
         log('fail', 'parse()', f'html soupe parser failed, good luck - {e}')
@@ -82,14 +86,25 @@ def parse(response: str) -> list[dict[str, str]] | None:
 
 def parse_image_path(img: str) -> str | bool:
     """ validate file extension to a whitelist of allowed """
-    # needs more validation and and maybe error handling
+    # check path traversal with regex
 
-    img_ext = img.split('.')[-1]
-    allowed_ext = ['jpg', 'png']
+    bad_chars = '$;|#&+"'
 
-    if img_ext not in allowed_ext:
-        log('fail', 'parse_image_path()', f'Image argument {img} not jpg or png filetype')
-        return False
+    for char in img:
+        if char in bad_chars:
+            log('fail', 'parse_image_path()', 'Image filepath contains possibly malicious characters')
+            return False
+
+    try:
+        img_ext = img.split('.')[-1]
+        allowed_ext = ['jpg', 'png']
+
+        if img_ext not in allowed_ext or len(img) > 100:
+            log('fail', 'parse_image_path()', f'Image argument {img} not jpg or png filetype')
+            return False
     
+    except Exception as e:
+        log('fail', 'parse_image_path()', f'Image argument {img}: caused undefined exception {e}')
+
     log('ok', 'parse_image_path()', 'valid extension')
     return img
