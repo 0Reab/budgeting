@@ -3,10 +3,12 @@
 # implement saving logs to a file
 
 
-def log(log_type: str, func: str, message: str) -> bool | None:
+def log(log_type: str, func: str, message: str, **kwargs) -> bool | None:
     """ main logging func - formatted and colored print: args -> function calls with log type and custom messages"""
     # "func" argument is a hardcoded string which can be inaccurate if actual func name is changed. 
     # for eg. log('ok', 'parser()', 'parsing of text') is bad if parser() was renamed into parsing_text().
+
+    suppress_print = kwargs.get('suppress_print', None)
 
     if not validate_call(log_type, message):
         return None
@@ -24,14 +26,15 @@ def log(log_type: str, func: str, message: str) -> bool | None:
 
     log_result = f'{color[log_type]}[{log_type}] in {func} - {message}{color['END']}'
 
-    print(log_result)
+    if not suppress_print:
+        print(log_result)
     return True
 
 
 def validate_call(log_type: str, message: str) -> bool | None:
     """ log() argument validation """
 
-    bad_call = f'Invalid log type for: {log_type} :with message: {message}'
+    bad_call = f'Bad func call: Invalid log type for: {log_type} ; with message ; {message}'
 
     def fail():
         print(bad_call)

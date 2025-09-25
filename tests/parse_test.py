@@ -3,13 +3,13 @@ from utils.parse import *
 
 """ Tests for parsing functions """
 
+fuzz = [ 'Not exist', 1, 0.55, True, False, '', 'http://', 'https://', 'http://www.']
 
 def test_fetch():
-    fuzz_url = []
 
-    for url in fuzz_url:
+    for url in fuzz:
         return_val = type(fetch(url=url))
 
-        pass  # not implemeneted
-    
-    print("[PASSED] fetch() - all passed")
+        output_str = ''
+
+        assert return_val 
