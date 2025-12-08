@@ -4,17 +4,22 @@ from datetime import datetime
 from utils.logger import log
 
 
-conn = sqlite3.connect("budget.db")
-cursor = conn.cursor()
+""" Module for: SQL queries, utilities, validation, formmated prints, DB connection object """
+
 
 categories = ['other', 'tool', 'food', 'transport', 'bill', 'cosmetic', 'nightout','hobby']
 
 
-def todays_date():
-    return datetime.today().strftime(r'%d-%m-%Y')
+def sql() -> tuple:
+    """ create cursor and SQL DB connection """
+
+    conn = sqlite3.connect("budget.db", check_same_thread=False)
+    return conn, conn.cursor()
 
 
-def in_categories(test):
+def in_categories(test) -> str | None:
+    """ Validation - if arg is in whitelist of array categories """
+
     try:
         idx = int(test)
 
@@ -28,46 +33,64 @@ def in_categories(test):
         if test in categories:
             return test
 
-        log('fail', 'in_categories()', f'validate {test}')
+        log('fail', 'in_categories()', f'validate {test} ; {type(test)}')
         return None
 
 
-def validate(category, name, price, amount, date) -> bool:
+def validate(category: str, name: str, price: float, amount: int, date: str) -> bool:
+    """
+    Main validation func of all insert(i) parameters
+    return True for successful validation otherwise False
+    """
+
     log_fail = lambda msg: log('fail', 'validate()', msg) 
 
-    # return True for successful validation otherwise False
     try:
         if in_categories(category) == None:
-            log_fail('Failed category check')
+            log_fail(f'Failed category check {category}')
             return False
 
         if price <= 0 or amount <= 0:
-            log_fail('Failed price and amount')
+            log_fail(f'Failed price or amount price={price} ; amount={amount}')
             return False
 
-        if len(name) > 100 or len(date) != 10:
-            log_fail('Failed name and date')
+        if len(name) > 100 or len(date) != 11:
+            log_fail(f'Failed name or date name={name} ; date={date}')
             return False
 
     except Exception as e:
         log_fail(f'Other validation error - {e}')
         return False
 
-    log('ok', 'validate()', 'validation')
+    log('ok', 'validate()', f'{category} ; {name}')
     return True
 
 
-def insert(category, name, price, amount, date):
+def insert(i: list) -> bool:
+    """ add entry to DB table with last validation step """
+
+    conn, cursor = sql()
+    category, name, price, amount, date = i
+
+    if validate(category, name, price, amount, date) is not True:
+        log('fail', 'insert()', 'SQL insert query validation')
+        return False
+
     cursor.execute("INSERT INTO expenses (category, name, price, amount, date) VALUES (?, ?, ?, ?, ?)",
         (category, name, price, amount, date))
 
     conn.commit()
-    log('info', 'insert()', 'SQL insert query')
+    log('info', 'insert()', f'SQL -> {name}')
 
     return True
 
 
-def delete():
+def delete() -> bool | None:
+    """ delete DB table entry by ID or wildcard """
+    # needs refactoring from CLI to Web app operations
+    # could refactor into two functions, validation and delete.
+
+    conn, cursor = sql()
     user_input = input(f'Select ID number to delete an entry: ')
 
     if user_input == '*':
@@ -104,17 +127,26 @@ def delete():
     return True
 
 
-def show_db():
+def show_db() -> list:
+    """ formatted print of all table entries to stdout """
+
+    conn, cursor = sql()
     cursor.execute("SELECT * FROM expenses")
     db = cursor.fetchall()
+    result = []
 
     log('ok', 'show_db()', 'SQL print db')
 
     for entry in db:
-        print(f'ID - {entry[0]} | categ - {entry[1]} | name - {entry[2]} | total - {entry[3]} | qty - {entry[4]} | date - {entry[5]}')
+        line = f'ID - {entry[0]} | categ - {entry[1]} | name - {entry[2]} | total - {entry[3]} | qty - {entry[4]} | date - {entry[5]}'
+        result.append(line)
+
+    return result
 
 
-def show_categories():
+def show_categories() -> None:
+    """ print global categories to stdout """
+
     log('ok', 'show_categories()', 'DB categories')
     print()
 
@@ -123,6 +155,10 @@ def show_categories():
 
 
 def con_close():
+    """ SQL connection closing """
+    # need to learn when and if this is needed 
+
+    conn, cursor = sql()
     conn.close()
 
     log('info', 'con_close()', 'closing connection')

@@ -1,12 +1,15 @@
 from utils.parse import *
 
 
-def test_fetch():
-    fuzz_url = []
+""" Tests for parsing functions """
 
-    for url in fuzz_url:
+fuzz = [ 'Not exist', 1, 0.55, True, False, '', 'http://', 'https://', 'http://www.']
+
+def test_fetch():
+
+    for url in fuzz:
         return_val = type(fetch(url=url))
 
-        pass  # not implemeneted
-    
-    print("[PASSED] fetch() - all passed")
+        output_str = ''
+
+        assert return_val 

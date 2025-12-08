@@ -1,17 +1,74 @@
 <!DOCTYPE html>
 <html lang="en">
   <head>
+    <link rel="stylesheet" href="/static/styles/style.css">
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <title>Budgeting app</title>
   </head>
   <body>
-    <h1>Budgeting app</h1>
+    <h1 class="mc">Budgeting app</h1>
     <p>upload image here</p>
     <form action="/upload" method="post" enctype="multipart/form-data">
-      <input type="file" id="myFile" name="file">
-      <input type="submit" value="Upload">
+      <input class="ba" type="file" id="myFile" name="file">
+      <input class="ba" type="submit" value="Upload">
     </form>
+    <script>
+      function loadData() {
+        window.location.href = "/saved" ;
+      }
+
+      function goHome() {
+        document.location.href = "/" ;
+      }
+
+      document.querySelector('.mc').addEventListener('click', goHome) ;
+    </script>
+    <button class="ba" onclick="loadData()">View all entries</button>
+
+{% if msg %}
+  <h3>{{ msg }}</h3>
+{% endif %}
+
+<form id="categories-form" method="POST" action="/categories">
+  {% for entry in db_result %}
+    <div class="entry-row" style="display: flex; gap: 10px; align-items: center; margin-bottom: 8px;">
+      <p class="text">{{ entry }}</p>
+
+      <div class="dropdown">
+        {% if edit %}
+        <button type="button" class="dropbtn">Select category</button>
+        {% endif %}
+        <div class="dropdown-content">
+          {% for cat in categories %}
+            <a href="#" data-cat="{{ cat }}">{{ cat }}</a>
+          {% endfor %}
+        </div>
+      </div>
+
+      <!-- hidden input to actually send with the form -->
+      <input type="hidden" name="categories[]" value="">
+    </div>
+  {% endfor %}
+  {% if edit %}
+  <button type="submit">Send</button>
+  {% endif %}
+</form>
+<script>
+document.querySelectorAll('.dropdown').forEach(dropdown => {
+  const button = dropdown.querySelector('.dropbtn');
+  const hiddenInput = dropdown.parentElement.querySelector('input[type="hidden"]');
+
+  dropdown.querySelectorAll('.dropdown-content a').forEach(option => {
+    option.addEventListener('click', e => {
+      e.preventDefault();
+      const category = option.dataset.cat;
+      button.textContent = category;
+      hiddenInput.value = category;
+    });
+  });
+});
+</script>
   </body>
 </html>

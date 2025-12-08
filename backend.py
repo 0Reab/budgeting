@@ -4,8 +4,11 @@ from utils.sql_utils import *
 from utils.ops import *
 
 
+""" Deprecated script - was a wrapper for all modules and functions as a CLI """
+
 
 def cmd(exec):
+    """ CLI wrapper """
     #execute = input('''
     #    Enter a command:
     #    exit = "Q"

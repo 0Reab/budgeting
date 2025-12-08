@@ -1,20 +1,27 @@
 # features to implement - ordered
 
+- complete duplicate entry check and reject insertion.
+- uploaded image duplicate detection and rejection - checksum?
+- tests for all functions - gotta do em
+- later in project - raise test exceptions after all tests run rather than immediate stop
+- Move categories into a json configuration - hardcoded currently
+- Data display and visualization - charts and plots
 
-1. select a category of an item being inserted into db.
-2. complete duplicate entry check and reject insertion.
-3. deployment - access from browser (flask webapp local to my network - easy setup).
-4. front end?
-5. uploaded image duplicate detection and rejection
-6. tests for all functions
-7. later in project - raise test exceptions after all tests run
-8. Move categories into a json configuration
-9. Data dipslay and visualization
-10. Should this backend be separated somehow?
-11. secret key in a file for flask server
+# make documentation
+- proper readme
+- requirements.txt
+
+# security
+- proper pentest after all is completed - sqli, rce, lfi, xss...
+- change to WSGI server
+- track processed images buy checksum value in a list, and don't keep images stored after processing
+- cookie based session - one time login - good practices
+- possible xss vector - receipt item name = payload, victim views tracked items = execution
+- possible ssrf - malicious qr code URL - makes the server visit any URL !
+- check path traversal regex in image path validation
 
 
 # known bugs
 
-selecting item category on user input is stuck in a infinite loop - fixed - poor return types and truth checks were not robust
-sql delete query works with negative integers for id specifier huh? - i forgor validation
+# run 
+python -m server.app
