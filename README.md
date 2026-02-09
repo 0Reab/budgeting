@@ -4,10 +4,8 @@ Upload photos of receipts for quick and easy personal budgeting.
 
 ## Description
 
-This application parses the QR code from the receipt photo.
-
-And allows you to annotate each item with custom category eg. food or bills.
-
+This application parses the QR code from the receipt photo.<br>
+And allows you to annotate each item with custom category eg. food or bills.<br>
 Saves the items in the SQL table designed for later analysis of cost or spending habits.
 
 ### Dependencies
@@ -24,6 +22,5 @@ Saves the items in the SQL table designed for later analysis of cost or spending
 
 ### Security note
 
-This application was not developed or secured for multiple users, but rather for personal self-hosted project.
-
+This application was not developed or secured for multiple users, but rather for personal self-hosted project.<br>
 Later updates will include, user auth, code security audit for web app bugs such as OWASP top 10 and etc.
