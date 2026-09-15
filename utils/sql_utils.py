@@ -76,11 +76,33 @@ def insert(i: list) -> bool:
         log('fail', 'insert()', 'SQL insert query validation')
         return False
 
-    cursor.execute("INSERT INTO expenses (category, name, price, amount, date) VALUES (?, ?, ?, ?, ?)",
-        (category, name, price, amount, date))
+    try:
+        cursor.execute("INSERT INTO expenses (category, name, price, amount, date) VALUES (?, ?, ?, ?, ?)",
+            (category, name, price, amount, date))
 
-    conn.commit()
-    log('info', 'insert()', f'SQL -> {name}')
+        conn.commit()
+        log('info', 'insert()', f'SQL -> {name}')
+
+    except sqlite3.OperationalError as e:
+        if 'no such table: expenses' in str(e):
+            cursor.execute("""
+            CREATE TABLE IF NOT EXISTS expenses (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                category TEXT,
+                name TEXT,
+                price REAL,
+                amount REAL,
+                date TEXT
+            )
+            """)
+            conn.commit()
+            log('info', 'insert()', f'SQL -> {name} (had to create table)')
+
+            cursor.execute("INSERT INTO expenses (category, name, price, amount, date) VALUES (?, ?, ?, ?, ?)",
+                (category, name, price, amount, date))
+
+            conn.commit()
+            log('info', 'insert()', f'SQL -> {name}')
 
     return True
 

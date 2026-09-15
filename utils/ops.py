@@ -14,8 +14,12 @@ def extract(item) -> list | None:
         result = []
 
         for data in item:
+            try:
+                amount = int(data['qty'])
+            except:
+                amount = float(data['qty'].replace(',', '.'))
+
             category = 'other'
-            amount = int(data['qty'])
             price = float(data['total'].replace('.', '').replace(',','.'))
             name = data['name']
             date = data['date']
@@ -42,6 +46,10 @@ def image_scan(img_path: str) -> list:
 
     url = scan(img)
     data = fetch(url)
+
+    if data is None:
+        return None
+
     raw = parse(data)
     result = extract(raw)
 

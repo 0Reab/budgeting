@@ -1,0 +1,29 @@
+# git repo stuff
+.git
+.gitignore
+
+# documentation
+todo.txt
+README.txt
+
+# user data
+server/images/
+budget.db
+budget.db-journal
+
+# logging
+logs/
+
+# python
+.venv/
+__pycache__/
+utils/__pycache__/
+tests/__pycache__/
+
+# configs
+.dockerignore
+Dockerimage
+.vscode/settings.json
+
+# secrets
+# key.txt # this is needed! (debug key for web server)

@@ -30,7 +30,7 @@ def home():
     if request.method == 'GET':
         return render_template('home.html')
     else:
-        return render_template('home_error.html')
+        return render_template('home_error.html', msg='Wrong HTTP method')
 
 
 @app.route('/saved', methods=['GET'])
@@ -42,7 +42,7 @@ def saved():
         entries = show_db()
         return render_template('home.html', db_result=entries, msg=msg)
     else:
-        return render_template('home_error.html')
+        return render_template('home_error.html', msg='Wrong HTTP method')
 
 
 @app.route('/categories', methods=['POST'])
@@ -77,7 +77,7 @@ def categories_post():
 
         return render_template('home.html', msg=msg)
     else:
-        return render_template('home_error.html')
+        return render_template('home_error.html', msg='Wrong HTTP method')
 
 
 @app.route('/upload', methods=['POST'])
@@ -100,7 +100,7 @@ def upload():
             return run_backend(file)
     else:
         log('fail', 'upload()', 'Image post request')
-        return render_template('home_error.html')
+        return render_template('home_error.html', 'Wrong HTTP method')
 
 
 def run_backend(file):
@@ -109,6 +109,7 @@ def run_backend(file):
     filename = secure_filename(file.filename)
     img_path = app.config['UPLOAD_FOLDER']
 
+    os.makedirs(img_path, exist_ok=True)
     file.save(os.path.join(img_path, filename))
 
     log('ok', 'upload()', 'Image post request')
@@ -116,6 +117,9 @@ def run_backend(file):
     filepath = f'{img_path}/{filename}'
     global items
     items = image_scan(filepath)
+
+    if items is None:
+        return render_template('home_error.html', msg="No URL found in QR code.")
 
     return render_template('home.html', db_result=items, msg='Success', edit='yes', categories=categories)
 

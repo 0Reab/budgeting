@@ -24,7 +24,7 @@ def log(log_type: str, func: str, message: str, **kwargs) -> bool | None:
 
     log_type = log_type.upper()
 
-    log_result = f'{color[log_type]}[{log_type}] in {func} - {message}{color['END']}'
+    log_result = f'{color[log_type]}[{log_type}] in {func} - {message}{color["END"]}'
 
     if not suppress_print:
         print(log_result)

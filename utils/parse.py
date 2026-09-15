@@ -12,7 +12,11 @@ def validate_url(url: str) -> bool:
     # add more validation for http parameter part of the url 
 
     valid = 'https://suf.purs.gov.rs/v/?vl='
-    xss_strings = r';%3B<>%3C%3E'
+    xss_strings = '' # this check is not secure at all + false positives... xss_strings = r';%3B<>%3C%3E'
+
+    if url is None:
+        log('fail', 'validate_url()', f"Didn't find URL in QR code.")
+        return False
 
     if not url.startswith(valid):
         log('fail', 'validate_url()', f'Invalid url: {url}')
@@ -87,6 +91,8 @@ def receit_regex(lines: list, date: str) -> list:
 
 def parse(response: str) -> list[dict[str, str]] | None:
     """ parse receipt in text form to extract bought items and other info """
+    if response is None:
+        return None
 
     delimiter = '=' * 40
     response = str(response)

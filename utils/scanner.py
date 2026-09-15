@@ -5,7 +5,8 @@ import cv2
 
 """ Module for reading QR code from image """
 
-qreader = QReader()
+# qreader = QReader() # for GPU processing
+qreader = QReader(model_size="s") # for CPU processing
 
 
 def scan(image_path: str) -> str | None:

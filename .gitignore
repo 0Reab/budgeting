@@ -8,3 +8,4 @@ utils/__pycache__/
 tests/__pycache__/
 server/__init__.py
 server/images/
+.venv/

@@ -14,6 +14,8 @@
       <input type="submit">
     </form>
     <p>An error occured</p>
-    <b>wrong http method or image upload fail</b>
+    {% if msg %}
+    <b>Error message: {{ msg }}</b>
+    {% endif %}
   </body>
 </html>
