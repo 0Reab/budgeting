@@ -7,7 +7,7 @@ from utils.logger import log
 """ Module for: SQL queries, utilities, validation, formmated prints, DB connection object """
 
 
-categories = ['other', 'tool', 'food', 'transport', 'bill', 'cosmetic', 'nightout','hobby']
+categories = ['other', 'tool', 'food', 'transport', 'bill', 'cosmetic', 'nightout', 'hobby']
 
 
 def sql() -> tuple:
@@ -43,7 +43,7 @@ def validate(category: str, name: str, price: float, amount: int, date: str) -> 
     return True for successful validation otherwise False
     """
 
-    log_fail = lambda msg: log('fail', 'validate()', msg) 
+    log_fail = lambda msg: log('fail', 'validate()', msg)
 
     try:
         if in_categories(category) == None:
@@ -153,7 +153,25 @@ def show_db() -> list:
     """ formatted print of all table entries to stdout """
 
     conn, cursor = sql()
-    cursor.execute("SELECT * FROM expenses")
+    try:
+        cursor.execute("SELECT * FROM expenses")
+
+    except sqlite3.OperationalError as e:
+        if 'no such table: expenses' in str(e):
+            cursor.execute("""
+            CREATE TABLE IF NOT EXISTS expenses (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                category TEXT,
+                name TEXT,
+                price REAL,
+                amount REAL,
+                date TEXT
+            )
+            """)
+            conn.commit()
+            log('info', 'show()', 'SQL -> (had to create table)')
+            cursor.execute("SELECT * FROM expenses")
+
     db = cursor.fetchall()
     result = []
 

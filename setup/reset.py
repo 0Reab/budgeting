@@ -4,6 +4,7 @@ from logging import log
 
 """ Script for debugging / testing - delete DB and create new, with the same table structure """
 
+
 def user_confirm():
     """ confirmed only if user input is 'y'
     return 'delete' upon success
@@ -50,4 +51,5 @@ def reset():
 
     c.close()
 
-#reset()
+
+# reset()

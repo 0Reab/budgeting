@@ -30,7 +30,19 @@ def home():
     if request.method == 'GET':
         return render_template('home.html')
     else:
-        return render_template('home_error.html', msg='Wrong HTTP method')
+        return render_template('home.html', err='Wrong HTTP method')
+
+
+@app.route('/health')
+def health():
+    # add more checks, then return 200 OK
+    # maybe file integrity, DB test...
+    return 'STATUS=OK', 200
+
+
+@app.route('/stats')
+def stats():
+    return 'stats coming soon TM', 200
 
 
 @app.route('/saved', methods=['GET'])
@@ -42,7 +54,7 @@ def saved():
         entries = show_db()
         return render_template('home.html', db_result=entries, msg=msg)
     else:
-        return render_template('home_error.html', msg='Wrong HTTP method')
+        return render_template('home.html', err='Wrong HTTP method')
 
 
 @app.route('/categories', methods=['POST'])
@@ -58,8 +70,11 @@ def categories_post():
         msg = 'Success :)'
 
         def error():
-            log('fail', 'categories_post()', f'invalid data in user_categs = {user_categs}')
-            return render_template('home.html', db_result=items, msg=err_msg, edit='yes', categories=categories), err_status
+            log('fail', 'categories_post()',
+                f'invalid data in user_categs = {user_categs}')
+            return render_template(
+                'home.html', db_result=items, msg=err_msg, edit='yes',
+                categories=categories), err_status
 
         # prevent insert when item buffer is empty (global var)
         # or item tags length do not match with items
@@ -69,15 +84,15 @@ def categories_post():
 
         for item in items:
             # update category with user input and insert in db
-            item[0] = user_categs[0] 
-            user_categs.pop(0) 
+            item[0] = user_categs[0]
+            user_categs.pop(0)
             insert(item)
 
-        items = [] # clear global buffer
+        items = []  # clear global buffer
 
         return render_template('home.html', msg=msg)
     else:
-        return render_template('home_error.html', msg='Wrong HTTP method')
+        return render_template('home.html', err='Wrong HTTP method')
 
 
 @app.route('/upload', methods=['POST'])
@@ -100,7 +115,7 @@ def upload():
             return run_backend(file)
     else:
         log('fail', 'upload()', 'Image post request')
-        return render_template('home_error.html', 'Wrong HTTP method')
+        return render_template('home.html', err='Wrong HTTP method')
 
 
 def run_backend(file):
@@ -113,18 +128,27 @@ def run_backend(file):
     file.save(os.path.join(img_path, filename))
 
     log('ok', 'upload()', 'Image post request')
-    
+
     filepath = f'{img_path}/{filename}'
     global items
     items = image_scan(filepath)
 
     if items is None:
-        return render_template('home_error.html', msg="No URL found in QR code.")
+        return render_template('home.html', err="No URL found in QR code.")
 
-    return render_template('home.html', db_result=items, msg='Success', edit='yes', categories=categories)
+    print(f'DEBUGGING -> {items}')
+
+    result = []
+    for entry in items:
+        line = f'ID - / | categ - {entry[0]} | name - {entry[1]} | total - {entry[2]} | qty - {entry[3]} | date - {entry[4]}'
+        result.append(line)
+
+    return render_template(
+        'home.html', db_result=result, msg='Success', edit='yes',
+        categories=categories)
 
 
 if __name__ == '__main__':
     app.secret_key = read_key()
     port = int(os.environ.get('PORT', 1337))
-    app.run(host='0.0.0.0', port=port)
+    app.run(host='0.0.0.0', port=port, debug=True)

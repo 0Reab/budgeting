@@ -1,0 +1,8 @@
+
+Medium CVSS severity:
+    Chart.js uses old JQuery version, DoS via prototype pollution and some input validation vuln.
+
+References: 
+    https://www.cybersecurity-help.cz/vdb/vulns/60879/
+    https://github.com/extent-framework/extentreports-java/issues/444
+
