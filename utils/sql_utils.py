@@ -97,38 +97,24 @@ def insert(i: list) -> bool:
     conn, cursor = sql()
     category, name, price, amount, date = i
 
+    query = 'INSERT INTO expenses (category, name, price, amount, date) VALUES (?, ?, ?, ?, ?)'
+    data = (category, name, price, amount, date)
+
     if validate(category, name, price, amount, date) is not True:
         log('fail', 'insert()', 'SQL insert query validation')
         return False
 
     try:
-        cursor.execute("INSERT INTO expenses (category, name, price, amount, date) VALUES (?, ?, ?, ?, ?)",
-            (category, name, price, amount, date))
-
+        cursor.execute(query, data)
         conn.commit()
-        log('info', 'insert()', f'SQL -> {name}')
 
     except sqlite3.OperationalError as e:
-        if 'no such table: expenses' in str(e):
-            cursor.execute("""
-            CREATE TABLE IF NOT EXISTS expenses (
-                id INTEGER PRIMARY KEY AUTOINCREMENT,
-                category TEXT,
-                name TEXT,
-                price REAL,
-                amount REAL,
-                date TEXT
-            )
-            """)
-            conn.commit()
-            log('info', 'insert()', f'SQL -> {name} (had to create table)')
+        sql_error_handler(error=e)
 
-            cursor.execute("INSERT INTO expenses (category, name, price, amount, date) VALUES (?, ?, ?, ?, ?)",
-                (category, name, price, amount, date))
+        cursor.execute(query, data)
+        conn.commit()
 
-            conn.commit()
-            log('info', 'insert()', f'SQL -> {name}')
-
+    log('info', 'insert()', f'SQL -> {name}')
     return True
 
 
@@ -176,26 +162,16 @@ def delete() -> bool | None:
 
 def show_db() -> list:
     """ formatted print of all table entries to stdout """
+    query = 'SELECT * FROM expenses'
 
     conn, cursor = sql()
     try:
-        cursor.execute("SELECT * FROM expenses")
+        cursor.execute(query)
 
     except sqlite3.OperationalError as e:
-        if 'no such table: expenses' in str(e):
-            cursor.execute("""
-            CREATE TABLE IF NOT EXISTS expenses (
-                id INTEGER PRIMARY KEY AUTOINCREMENT,
-                category TEXT,
-                name TEXT,
-                price REAL,
-                amount REAL,
-                date TEXT
-            )
-            """)
-            conn.commit()
-            log('info', 'show()', 'SQL -> (had to create table)')
-            cursor.execute("SELECT * FROM expenses")
+        sql_error_handler(error=e)
+
+    cursor.execute(query)
 
     db = cursor.fetchall()
     result = []
