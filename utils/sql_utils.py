@@ -103,7 +103,6 @@ def insert(i: list) -> bool:
     if validate(category, name, price, amount, date) is not True:
         log('fail', 'insert()', 'SQL insert query validation')
         return False
-
     try:
         cursor.execute(query, data)
         conn.commit()
