@@ -42,7 +42,15 @@ def health():
 
 @app.route('/stats')
 def stats():
-    return 'stats coming soon TM', 200
+    '''Fetch entries based on a timeframe'''
+
+    if request.method == 'GET':
+        time = request.args.get('time_scale', default='month', type=str)
+        categories = request.args.get('categories', default=None, type=NoneType)
+
+        result = db_
+
+        return jsonify(result)
 
 
 @app.route('/saved', methods=['GET'])

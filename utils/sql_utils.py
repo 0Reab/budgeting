@@ -17,6 +17,31 @@ def sql() -> tuple:
     return conn, conn.cursor()
 
 
+def sql_error_handler(error) -> None:
+    '''Creates default table on specific error, expand for other edge cases.'''
+    conn, cursor = sql()
+
+    if 'no such table: expenses' in str(error):
+        cursor.execute("""
+        CREATE TABLE IF NOT EXISTS expenses (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            category TEXT,
+            name TEXT,
+            price REAL,
+            amount REAL,
+            date TEXT
+        )
+        """)
+
+        conn.commit()
+        log('info', 'sql_error_handler()',
+            'SQL -> (had to create default table)')
+    else:
+        log('fail', 'sql_error_handler()',
+            'SQL -> unhandled sql error')
+        raise Exception('database blew up.')
+
+
 def in_categories(test) -> str | None:
     """ Validation - if arg is in whitelist of array categories """
 
@@ -46,7 +71,7 @@ def validate(category: str, name: str, price: float, amount: int, date: str) -> 
     log_fail = lambda msg: log('fail', 'validate()', msg)
 
     try:
-        if in_categories(category) == None:
+        if in_categories(category) is None:
             log_fail(f'Failed category check {category}')
             return False
 
@@ -113,7 +138,7 @@ def delete() -> bool | None:
     # could refactor into two functions, validation and delete.
 
     conn, cursor = sql()
-    user_input = input(f'Select ID number to delete an entry: ')
+    user_input = input('Select ID number to delete an entry: ')
 
     if user_input == '*':
 
@@ -131,13 +156,13 @@ def delete() -> bool | None:
             cursor.execute("SELECT id FROM expenses")
             rows = cursor.fetchall()
 
-            id_nums = [ row[0] for row in rows]
+            id_nums = [row[0] for row in rows]
 
             if int(user_input) not in id_nums:
                 log('fail', 'delete()', f'not found id={user_input} in DB')
                 return None
 
-            cursor.execute(f"DELETE FROM expenses WHERE id = (?)", [user_input])
+            cursor.execute("DELETE FROM expenses WHERE id = (?)", [user_input])
 
         except (sqlite3.ProgrammingError, ValueError, TypeError) as e:
             log('fail', 'delete()', f'sql query error with id={user_input} - {e}')
@@ -196,7 +221,7 @@ def show_categories() -> None:
 
 def con_close():
     """ SQL connection closing """
-    # need to learn when and if this is needed 
+    # need to learn when and if this is needed
 
     conn, cursor = sql()
     conn.close()
