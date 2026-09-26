@@ -7,6 +7,8 @@ Entry parsing
 Category dropdowns
 */
 
+const idList = new Set();
+
 // Start everything after the page loads.
 
 document.addEventListener("DOMContentLoaded", () => {
@@ -15,6 +17,42 @@ document.addEventListener("DOMContentLoaded", () => {
     setupEntries();
     setupDropdowns();
 });
+
+// Deletion
+
+function selectID(element) {
+    const id = element.closest('tr').querySelector('.table-value').textContent.trim();
+
+    if (element.checked) {
+        idList.add(id);
+    } else {
+        idList.delete(id);
+    }
+}
+
+async function deleteSelected() {
+    if (idList.size === 0) {
+        return;
+    }
+
+    const params = new URLSearchParams();
+    let url = '/api/delete?';
+
+    for (const id of idList) {
+        params.append('id', id);
+    }
+
+    const response = await fetch(`${url}${params.toString()}`, {
+        method: 'DELETE'
+    });
+
+    if (!response.ok) {
+        console.error('Failed to delete selected IDs');
+        return;
+    }
+
+    location.reload();
+}
 
 /* Navigation */
 

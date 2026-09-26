@@ -1,8 +1,11 @@
-from flask import Flask, render_template, request, flash, redirect, url_for
-from werkzeug.utils import secure_filename
-from utils.logger import log
-from backend import *
 import os
+
+from flask import Flask, render_template, request, flash, redirect, jsonify
+from werkzeug.utils import secure_filename
+
+from utils.sql_utils import show_db, insert, categories, show_sum_of, db_delete
+from utils.ops import image_scan
+from utils.logger import log
 
 
 app = Flask(__name__, template_folder='pages')
@@ -42,16 +45,53 @@ def health():
     return 'STATUS=OK', 200
 
 
-@app.route('/stats')
+@app.route('/api/stats/month', methods=['GET'])
 def stats():
     '''Fetch entries based on a timeframe'''
 
-    time = request.args.get('time_scale', default='month', type=str)
-    categories = request.args.get('categories', default=None, type=NoneType)
+    count = request.args.get('count', default=1, type=int)
+    selected_categories = request.args.getlist('categories', default=categories)
 
-    # result = db_
+    for categ in set(selected_categories):
+        if categ not in categories:
+            return jsonify({'error': f'parameter category {categ} not available.'}), 400
 
-    return 'test', 200  # jsonify(result)
+    if not (0 < count < 9999):
+        return jsonify({'error': 'parameter count out of accepted range.'}), 400
+
+    return jsonify(show_sum_of(
+        time_type='monthly',
+        categories=selected_categories,
+        count=count
+    ))
+
+
+@app.route('/api/delete', methods=['DELETE'])
+def delete_entry():
+    '''Delete database entries with given ID'''
+
+    id_list = request.args.getlist("id")
+
+    if len(id_list) != len(set(id_list)):
+        return jsonify({'error': "There are duplicate IDs in your query."}), 400
+
+    if len(id_list) > 50 or len(id_list) <= 0:
+        print(len(id_list))
+        return jsonify({'error': "Amount of IDs to delete must be x > 0 and x < 50"}), 400
+
+    # add tons of validation of user input from id_list later
+
+    errors = []
+
+    for id in id_list:
+        if db_delete(id) is False:
+            errors.append(f'Failed to delete id: {id}')
+
+    msg = f'{'error' if errors else 'ok'}'
+
+    return jsonify(
+        {'status': msg, msg: errors}
+    )
 
 
 @app.route('/saved', methods=['GET'])
@@ -142,5 +182,5 @@ def run_backend(file):
 
 if __name__ == '__main__':
     app.secret_key = read_key()
-    port = int(os.environ.get('PORT', 1337))
+    port = int(os.environ.get('PORT', '1337'))
     app.run(host='0.0.0.0', port=port, debug=True)

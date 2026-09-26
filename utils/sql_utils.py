@@ -1,7 +1,6 @@
 import sqlite3
-import utils.scanner as scanner
-from datetime import datetime
 from utils.logger import log
+# from datetime import datetime
 
 
 """ Module for: SQL queries, utilities, validation, formmated prints, DB connection object """
@@ -117,25 +116,18 @@ def insert(i: list) -> bool:
     return True
 
 
-def delete() -> bool | None:
+def db_delete(id: str) -> bool:
     """ delete DB table entry by ID or wildcard """
     # needs refactoring from CLI to Web app operations
     # could refactor into two functions, validation and delete.
 
     conn, cursor = sql()
-    user_input = input('Select ID number to delete an entry: ')
+    # user_input = input('Select ID number to delete an entry: ')
 
-    if user_input == '*':
-
-        check = input('Delete everything? y/n: ')
-
-        if check == 'y':
-            cursor.execute("DELETE FROM expenses")
-            log('ok', 'delete()', 'SQL database wipe')
-            return True
-        else:
-            log('info', 'delete()', 'SQL delete query aborted')
-            return 'abort delete'
+    if id == '*':
+        cursor.execute("DELETE FROM expenses")
+        log('ok', 'delete()', 'SQL database wipe')
+        return True
     else:
         try:
             cursor.execute("SELECT id FROM expenses")
@@ -143,18 +135,18 @@ def delete() -> bool | None:
 
             id_nums = [row[0] for row in rows]
 
-            if int(user_input) not in id_nums:
-                log('fail', 'delete()', f'not found id={user_input} in DB')
-                return None
+            if int(id) not in id_nums:
+                log('fail', 'delete()', f'not found id={id} in DB')
+                return False
 
-            cursor.execute("DELETE FROM expenses WHERE id = (?)", [user_input])
+            cursor.execute("DELETE FROM expenses WHERE id = (?)", [id])
 
         except (sqlite3.ProgrammingError, ValueError, TypeError) as e:
-            log('fail', 'delete()', f'sql query error with id={user_input} - {e}')
-            return None
+            log('fail', 'delete()', f'sql query error with id={id} - {e}')
+            return False
 
     conn.commit()
-    log('ok', 'delete()', 'SQL deleted entry')
+    log('ok', 'delete()', f'SQL deleted entry ID {id}')
 
     return True
 
@@ -163,14 +155,14 @@ def show_db() -> list:
     """ formatted print of all table entries to stdout """
     query = 'SELECT * FROM expenses'
 
-    conn, cursor = sql()
+    _conn, cursor = sql()
     try:
         cursor.execute(query)
 
     except sqlite3.OperationalError as e:
         sql_error_handler(error=e)
 
-    cursor.execute(query)
+        cursor.execute(query)
 
     db = cursor.fetchall()
     result = []
@@ -182,6 +174,37 @@ def show_db() -> list:
         result.append(line)
 
     return result
+
+
+def show_sum_of(time_type: str, categories: list, count: int):
+    ''' eg. count=12, time_type='monthly', categories=['food'] '''
+    # last year of each month total spent on food.
+    #
+    # example db date -> 17.09.2026. TEXT
+    # this ufnc return dict -> { jan: 50, feb: 60 ...}
+
+    # get current date
+    # default the day as 1 always.
+    # subtract count arg from curr date - roll over to 12 again if hit 0 (also decrement year)
+    # so if count=12 so entries from 1.9.2025 til today
+    #
+    # now how do i get all entries in between that first entry of date to today.
+    # you could do by month then by year check for greater nubers in db?
+    # so lets say years, any entry of year higher good to go.
+    # and for months any month as farthes and higher if the year is not different
+    #
+    # but i also gotta sum each month - should be easy, *.9.2025 so anything that satisfies this i gues, take total values and sum
+
+    query = 'SELECT FROM expenses WHERE date = (?)'
+
+    _conn, cursor = sql()
+    try:
+        cursor.execute(query)
+
+    except sqlite3.OperationalError as e:
+        sql_error_handler(error=e)
+
+        cursor.execute(query)
 
 
 def show_categories() -> None:
@@ -198,8 +221,7 @@ def con_close():
     """ SQL connection closing """
     # need to learn when and if this is needed
 
-    conn, cursor = sql()
+    conn, _cursor = sql()
     conn.close()
 
     log('info', 'con_close()', 'closing connection')
-    exit()

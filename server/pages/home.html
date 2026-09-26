@@ -56,7 +56,7 @@
             <button onclick="showElementsClass('edits')" id='edit-button'
                 style="background-color: lightblue; display: none; margin: 5px;">Edit</button>
 
-            <button onclick="showElementId('undo-button')" id="delete-button" class="edits"
+            <button onclick="showElementId('undo-button'); deleteSelected();" id="delete-button" class="edits"
                 style="background-color: darkred; display: none; margin: 5px;">Delete</button>
             <button id="undo-button" class="edits"
                 style="background-color: dimgray; display: none; margin: 5px;">Undo</button>
@@ -94,6 +94,7 @@
                     <table class="entries-table">
                         <thead>
                             <tr>
+                                <th>Edit</th>
                                 <th>ID</th>
                                 <th>Category</th>
                                 <th>Name</th>
@@ -105,6 +106,10 @@
                         <tbody>
                             {% for entry in db_result %}
                             <tr class="entry-row" data-entry="{{ entry | e }}">
+                                <!-- ID selector -->
+                                <td>
+                                    <input type="checkbox" onclick="selectID(this)">
+                                </td>
                                 <!-- ID -->
                                 <td>
                                     <span class="table-value" data-field="id"></span>
