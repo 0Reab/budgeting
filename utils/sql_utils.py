@@ -6,7 +6,9 @@ from utils.logger import log
 """ Module for: SQL queries, utilities, validation, formmated prints, DB connection object """
 
 
-categories = ['other', 'tool', 'food', 'transport', 'bill', 'cosmetic', 'nightout', 'hobby']
+categories_expenses = ['other', 'tool', 'food', 'transport', 'bill', 'cosmetic', 'nightout', 'hobby']
+categories_income = ['bug bounty', 'photoshop', 'modoolar']
+currencies = ['USD', 'GBP', 'RSD']  # USD, British pound, RSD
 
 
 def sql() -> tuple:
@@ -34,34 +36,51 @@ def sql_error_handler(error) -> None:
 
         conn.commit()
         log('info', 'sql_error_handler()',
-            'SQL -> (had to create default table)')
+            'SQL -> (had to create default expenses table)')
+
+    elif 'no such table: income' in str(error):
+        cursor.execute("""
+        CREATE TABLE IF NOT EXISTS income (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            category TEXT,
+            description TEXT,
+            converted_amount REAL,
+            link TEXT,
+            amount REAL,
+            currency CHAR(3),
+            date TEXT
+        )
+        """)
+
+        conn.commit()
+        log('info', 'sql_error_handler()',
+            'SQL -> (had to create default income table)')
     else:
         log('fail', 'sql_error_handler()',
             'SQL -> unhandled sql error')
         raise Exception('database blew up.')
 
 
-def in_categories(test) -> str | None:
+def in_categories(test, valid_categ: list) -> str | None:
     """ Validation - if arg is in whitelist of array categories """
-
     try:
         idx = int(test)
 
-        if len(categories) <= idx:
+        if len(valid_categ) <= idx:
             log('fail', 'in_categories()', f'validate {test}, categories[{idx}] out of range')
             return None
 
-        return categories[idx]
+        return valid_categ[idx]
 
     except (TypeError, ValueError):
-        if test in categories:
+        if test in valid_categ:
             return test
 
         log('fail', 'in_categories()', f'validate {test} ; {type(test)}')
         return None
 
 
-def validate(category: str, name: str, price: float, amount: int, date: str) -> bool:
+def validate(category: str, name: str, price: float, amount: float, date: str, currency: str, link: str, valid_categ: list) -> bool:
     """
     Main validation func of all insert(i) parameters
     return True for successful validation otherwise False
@@ -70,7 +89,7 @@ def validate(category: str, name: str, price: float, amount: int, date: str) -> 
     log_fail = lambda msg: log('fail', 'validate()', msg)
 
     try:
-        if in_categories(category) is None:
+        if in_categories(category, valid_categ) is None:
             log_fail(f'Failed category check {category}')
             return False
 
@@ -82,6 +101,14 @@ def validate(category: str, name: str, price: float, amount: int, date: str) -> 
             log_fail(f'Failed name or date name={name} ; date={date}')
             return False
 
+        if currency not in currencies:
+            log_fail(f'Failed currency={currency} not in {currencies}')
+            return False
+
+        if not link.startswith('https://') or not link.startswith('http://'):
+            log_fail(f'Failed link={link} is not https or http')
+            return False
+
     except Exception as e:
         log_fail(f'Other validation error - {e}')
         return False
@@ -90,7 +117,7 @@ def validate(category: str, name: str, price: float, amount: int, date: str) -> 
     return True
 
 
-def insert(i: list) -> bool:
+def insert_expense(i: list) -> bool:
     """ add entry to DB table with last validation step """
 
     conn, cursor = sql()
@@ -112,7 +139,38 @@ def insert(i: list) -> bool:
         cursor.execute(query, data)
         conn.commit()
 
-    log('info', 'insert()', f'SQL -> {name}')
+    log('info', 'insert_expense()', f'SQL -> {name}')
+    return True
+
+
+def insert_income(category, description, converted_amount, link, amount, currency, date):
+    #                            bug bounty  XSS         50,000           http  500      $       2026...
+    query = 'INSERT INTO income (category, description, converted_amount, link, amount, currency, date) VALUES (?, ?, ?, ?, ?, ?, ?)'
+    data = (category, description, converted_amount, link, amount, currency, date)
+    conn, cursor = sql()
+
+    validate(
+        category=category,
+        price=converted_amount,
+        amount=amount,
+        date=date,
+        currency=currency,
+        link=link,
+        valid_list=categories_income,
+        name=description  # 100 char limit
+    )
+
+    try:
+        cursor.execute(query, data)
+        conn.commit()
+
+    except sqlite3.OperationalError as e:
+        sql_error_handler(error=e)
+
+        cursor.execute(query, data)
+        conn.commit()
+
+    log('info', 'insert_income()', f'SQL -> {category} of {amount} {currency}')
     return True
 
 
@@ -213,7 +271,7 @@ def show_categories() -> None:
     log('ok', 'show_categories()', 'DB categories')
     print()
 
-    for idx, cat in enumerate(categories):
+    for idx, cat in enumerate(categories_income):
         print(f'{cat} - {idx}')
 
 

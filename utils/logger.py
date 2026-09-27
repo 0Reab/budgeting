@@ -4,7 +4,10 @@
 
 
 def log(log_type: str, func: str, message: str, **kwargs) -> bool | None:
-    """ main logging func - formatted and colored print: args -> function calls with log type and custom messages"""
+    """
+    main logging func - formatted and colored print: args -> function calls with log type and custom messages
+    log_type = OK, FAIL, INFO, END, rest is arbitrary text.
+    """
     # "func" argument is a hardcoded string which can be inaccurate if actual func name is changed. 
     # for eg. log('ok', 'parser()', 'parsing of text') is bad if parser() was renamed into parsing_text().
 

@@ -40,7 +40,13 @@
             </div>
             <script>
                 function showElementId(name) {
-                    document.getElementById(name).style.display = 'inline';
+                    let style = document.getElementById(name).style.display; // = 'inline';
+
+                    if (style === 'none') {
+                        document.getElementById(name).style.display = 'inline';
+                    } else {
+                        document.getElementById(name).style.display = 'none';
+                    }
                 }
 
                 function showElementsClass(name) {
@@ -48,15 +54,19 @@
                     let elements = document.querySelectorAll(selector);
 
                     elements.forEach(element => {
-                        element.style.display = 'inline';
+                        if (element.style.display === 'none') {
+                            element.style.display = 'table-cell';
+                        } else {
+                            element.style.display = 'none';
+                        }
                     });
                 }
             </script>
 
-            <button onclick="showElementsClass('edits')" id='edit-button'
+            <button onclick="showElementsClass('edits'); showElementId('delete-button')" id='edit-button'
                 style="background-color: lightblue; display: none; margin: 5px;">Edit</button>
 
-            <button onclick="showElementId('undo-button'); deleteSelected();" id="delete-button" class="edits"
+            <button onclick="showElementId('undo-button'); deleteSelected();" id="delete-button"
                 style="background-color: darkred; display: none; margin: 5px;">Delete</button>
             <button id="undo-button" class="edits"
                 style="background-color: dimgray; display: none; margin: 5px;">Undo</button>
@@ -64,7 +74,7 @@
             <script>
                 if (window.location.pathname === '/saved') {
                     showElementId('edit-button');
-                    showElementId('delete-button');
+                    // showElementId('delete-button');
                 }
             </script>
         </section>
@@ -94,8 +104,8 @@
                     <table class="entries-table">
                         <thead>
                             <tr>
-                                <th>Edit</th>
-                                <th>ID</th>
+                                <th class="edits" style="display: none">Edit</th>
+                                <th class="edits" style="display: none">ID</th>
                                 <th>Category</th>
                                 <th>Name</th>
                                 <th>Total</th>
@@ -107,11 +117,11 @@
                             {% for entry in db_result %}
                             <tr class="entry-row" data-entry="{{ entry | e }}">
                                 <!-- ID selector -->
-                                <td>
+                                <td class="edits" style="display: none">
                                     <input type="checkbox" onclick="selectID(this)">
                                 </td>
                                 <!-- ID -->
-                                <td>
+                                <td class="edits" style="display: none">
                                     <span class="table-value" data-field="id"></span>
                                 </td>
                                 <!-- Category -->

@@ -3,7 +3,7 @@ import os
 from flask import Flask, render_template, request, flash, redirect, jsonify
 from werkzeug.utils import secure_filename
 
-from utils.sql_utils import show_db, insert, categories, show_sum_of, db_delete
+from utils.sql_utils import show_db, insert_expense, categories_expenses, categories_income, show_sum_of, db_delete, insert_income
 from utils.ops import image_scan
 from utils.logger import log
 
@@ -50,10 +50,10 @@ def stats():
     '''Fetch entries based on a timeframe'''
 
     count = request.args.get('count', default=1, type=int)
-    selected_categories = request.args.getlist('categories', default=categories)
+    selected_categories = request.args.getlist('categories', default=categories_expenses)
 
     for categ in set(selected_categories):
-        if categ not in categories:
+        if categ not in categories_expenses:
             return jsonify({'error': f'parameter category {categ} not available.'}), 400
 
     if not (0 < count < 9999):
@@ -64,6 +64,37 @@ def stats():
         categories=selected_categories,
         count=count
     ))
+
+
+@app.route('/api/insert/income', methods=['POST'])
+def income():
+    ''' Add data to income table. '''
+
+    # category, description, converted_amount, link, amount, currency, date
+
+    converted_amount = request.form['converted_amount']
+    description = request.form['description']
+    category = request.form['category']
+    currency = request.form['currency']
+    amount = request.form['amount']
+    link = request.form['link']
+    date = request.form['date']
+
+    ok = insert_income(
+        category,
+        description,
+        converted_amount,
+        link,
+        amount,
+        currency,
+        date
+    )
+
+    msg = f'{'ok' if ok else 'error'}'
+
+    return jsonify(
+        {'status': msg}
+    )
 
 
 @app.route('/api/delete', methods=['DELETE'])
@@ -120,13 +151,13 @@ def categories_post():
 
     if not items or len(items) != len(user_categs) or '' in user_categs:
         log('fail', 'categories_post()', f'invalid data in user_categs = {user_categs}')
-        return render_template('home.html', db_result=items, msg=err_msg, edit='yes', categories=categories), err_status
+        return render_template('home.html', db_result=items, msg=err_msg, edit='yes', categories=categories_expenses), err_status
 
     for item in items:
         # update category with user input and insert in db
         item[0] = user_categs[0]
         user_categs.pop(0)
-        insert(item)
+        insert_expense(item)
 
     items = []  # clear global buffer
 
@@ -177,7 +208,7 @@ def run_backend(file):
         result.append(line)
 
     return render_template(
-        'home.html', db_result=result, msg='Success', edit='yes', categories=categories)
+        'home.html', db_result=result, msg='Success', edit='yes', categories=categories_expenses)
 
 
 if __name__ == '__main__':
