@@ -1,6 +1,6 @@
-{
-        box-sizing: border-box;
-    }
+* {
+    box-sizing: border-box;
+}
 
     body {
         margin: 0;
@@ -64,10 +64,11 @@
     /* Upload */
 
     .upload-row {
-        /* display: flex; */
-        display: inline-block;
+        display: flex;
+        flex-wrap: wrap;
         gap: 10px;
         align-items: center;
+        width: 100%;
     }
 
     input[type="file"] {
@@ -185,14 +186,12 @@
 
     .table-wrapper {
         width: 100%;
-        /*overflow-x: auto;*/
-        overflow-y: visible;
-        -webkit-overflow-scrolling: touch;
+        max-width: 100%;
     }
 
     .entries-table {
         width: 100%;
-        min-width: 700px;
+        min-width: 600px;
         border-collapse: collapse;
         table-layout: fixed;
         font-size: 14px;
@@ -220,6 +219,12 @@
         border-bottom: none;
     }
 
+    /* Hidden category input cell - keep it submitted, remove the empty column */
+
+    .entries-table td:last-child {
+        display: none;
+    }
+
     .entries-table tbody tr:hover {
         background: #fafafa;
     }
@@ -228,32 +233,37 @@
 
     .entries-table th:nth-child(1),
     .entries-table td:nth-child(1) {
-        width: 25px;
+        width: 36px;
     }
 
     .entries-table th:nth-child(2),
     .entries-table td:nth-child(2) {
-        width: 80px;
+        width: 56px;
     }
 
     .entries-table th:nth-child(3),
     .entries-table td:nth-child(3) {
-        width: auto;
+        width: 120px;
     }
 
     .entries-table th:nth-child(4),
     .entries-table td:nth-child(4) {
-        width: 80px;
+        width: auto;
     }
 
     .entries-table th:nth-child(5),
     .entries-table td:nth-child(5) {
-        width: 50px;
+        width: 84px;
     }
 
     .entries-table th:nth-child(6),
     .entries-table td:nth-child(6) {
-        width: 80px;
+        width: 56px;
+    }
+
+    .entries-table th:nth-child(7),
+    .entries-table td:nth-child(7) {
+        width: 104px;
     }
 
     /* Table values */
@@ -269,10 +279,6 @@ Product names stay on one line and are
 
 truncated when they become too long.
 */
-
-    .name-cell {
-        max-width: 0;
-    }
 
     .name-cell .table-value {
         overflow: hidden;
@@ -381,13 +387,8 @@ changing into a completely different layout.
 */
 
         .table-wrapper {
-            margin-left: -2px;
-            margin-right: -2px;
-            width: calc(100% + 4px);
-        }
-
-        .entries-table {
-            min-width: 700px;
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
         }
 
         /*
