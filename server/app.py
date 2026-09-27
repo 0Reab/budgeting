@@ -66,9 +66,14 @@ def stats():
     ))
 
 
+@app.route('/add-income', methods=['GET'])
+def income_template():
+    return render_template('home.html', categories_income=categories_income, msg='Add your income.')
+
+
 @app.route('/api/insert/income', methods=['POST'])
 def income():
-    ''' Add data to income table. '''
+    ''' Add data to income table. NEED TO CHECK IF DATE FORMAT IS THE SAME AS RECEIPTS! -> frontend form is mm/dd/yyy'''
 
     # category, description, converted_amount, link, amount, currency, date
 

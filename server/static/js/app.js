@@ -5,6 +5,8 @@ Navigation
 Upload loading indicator
 Entry parsing
 Category dropdowns
+Select and delete rows in DB
+Form for income
 */
 
 const idList = new Set();
@@ -16,7 +18,49 @@ document.addEventListener("DOMContentLoaded", () => {
     setupUpload();
     setupEntries();
     setupDropdowns();
+    main();
 });
+
+function main() {
+    if (window.location.pathname === '/saved') {
+        showElementId('edit-button', '');
+    }
+
+    if (window.location.pathname === '/add-income') {
+        showElementId('add-income-form', 'grid');
+    }
+}
+
+// helper shorthanders lel
+
+function showElementId(name, targetStyle = 'inline') {
+    const element = document.getElementById(name);
+
+    if (!element) {
+        console.error(`Couldn't find element ${name}.`)
+        return;
+    } 
+
+    element.style.display =
+        element.style.display === 'none' ? targetStyle : 'none';
+}
+
+
+function showElementsClass(name) {
+    let selector = '.' + name;
+    let elements = document.querySelectorAll(selector);
+
+    elements.forEach(element => {
+        if (element.style.display === 'none') {
+            element.style.display = 'table-cell';
+        } else {
+            element.style.display = 'none';
+        }
+    });
+}
+
+
+// income form and more
 
 // Deletion
 
@@ -59,6 +103,9 @@ async function deleteSelected() {
 function setupNavigation() {
     const title = document.querySelector(".mc");
     const savedButton = document.getElementById("saved-button");
+    const incomeButton = document.getElementById("add-income-button");
+    const deleteButton = document.getElementById("delete-button");
+    const editButton = document.getElementById("edit-button");
 
     if (title) {
         title.addEventListener("click", () => {
@@ -70,6 +117,26 @@ function setupNavigation() {
         savedButton.addEventListener("click", () => {
             window.location.href = "/saved";
         });
+    }
+
+    if (incomeButton) {
+        incomeButton.addEventListener("click", () => {
+            window.location.href = "/add-income";
+        })
+    }
+
+    if (deleteButton) {
+        deleteButton.addEventListener("click", () => {
+            showElementId('undo-button');
+            deleteSelected();
+        })
+    }
+
+    if (editButton) {
+        editButton.addEventListener("click", () => {
+            showElementId('delete-button');
+            showElementsClass('edits');
+        })
     }
 }
 

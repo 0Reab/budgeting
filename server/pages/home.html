@@ -30,52 +30,31 @@
                 </div>
             </form>
             <div class="upload-row">
+                <button type="button" class="saved-button" id="add-income-button">
+                    Add income 
+                </button>
+
+                <button type="button" class="saved-button" id="show-income-button">
+                    Show income 
+                </button>
+
                 <button type="button" class="saved-button" id="saved-button">
-                    View all entries
+                    View all expenses
                 </button>
 
                 <button type="button" class="saved-button" id="renderBtn">
                     Monthly expenses
                 </button>
             </div>
-            <script>
-                function showElementId(name) {
-                    let style = document.getElementById(name).style.display; // = 'inline';
-
-                    if (style === 'none') {
-                        document.getElementById(name).style.display = 'inline';
-                    } else {
-                        document.getElementById(name).style.display = 'none';
-                    }
-                }
-
-                function showElementsClass(name) {
-                    let selector = '.' + name;
-                    let elements = document.querySelectorAll(selector);
-
-                    elements.forEach(element => {
-                        if (element.style.display === 'none') {
-                            element.style.display = 'table-cell';
-                        } else {
-                            element.style.display = 'none';
-                        }
-                    });
-                }
-            </script>
-
-            <button onclick="showElementsClass('edits'); showElementId('delete-button')" id='edit-button'
+            <button id='edit-button'
                 style="background-color: lightblue; display: none; margin: 5px;">Edit</button>
 
-            <button onclick="showElementId('undo-button'); deleteSelected();" id="delete-button"
+            <button id="delete-button"
                 style="background-color: darkred; display: none; margin: 5px;">Delete</button>
             <button id="undo-button" class="edits"
                 style="background-color: dimgray; display: none; margin: 5px;">Undo</button>
 
             <script>
-                if (window.location.pathname === '/saved') {
-                    showElementId('edit-button');
-                    // showElementId('delete-button');
-                }
             </script>
         </section>
         <!-- Messages -->
@@ -98,6 +77,61 @@
                     <p>Your saved expenses.</p>
                 </div>
             </div>
+
+            <form style="display: none;" id="add-income-form" method="POST" action="/api/insert/income">
+                    <label for="category">Category</label>
+                    <select id="category" name="category" required>
+                        {% for category in categories_income %}
+                            <option value="{{ category }}">{{ category }}</option>
+                        {% endfor %}
+                    </select>
+
+                    <label for="description">Description</label>
+                    <input
+                        id="description"
+                        name="description"
+                        type="text"
+                        maxlength="100"
+                        required
+                    >
+
+                    <input id="converted_amount" name="converted_amount" type="hidden">
+
+                    <label for="link">Link</label>
+                    <input
+                        id="link"
+                        name="link"
+                        type="url"
+                        placeholder="Paste link"
+                    >
+
+                    <label for="amount">Amount</label>
+                    <input
+                        id="amount"
+                        name="amount"
+                        type="number"
+                        step="any"
+                        required
+                    >
+
+                    <label for="currency">Currency</label>
+                    <select id="currency" name="currency" required>
+                        <option value="RSD">RSD</option>
+                        <option value="USD">USD</option>
+                        <option value="GBP">GBP</option>
+                    </select>
+
+                    <label for="date">Date</label>
+                    <input
+                        id="date"
+                        name="date"
+                        type="date"
+                        required
+                    >
+                <button class="send-income-button" type="submit">Submit</button>
+
+            </form>
+
             <form id="categories-form" method="POST" action="/categories">
                 {% if db_result %}
                 <div class="table-wrapper">
