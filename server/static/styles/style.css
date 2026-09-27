@@ -16,6 +16,24 @@
         margin: 0 auto;
     }
 
+    textarea {
+        font-size: inherit;
+        font-family: inherit;
+    }
+
+    .income-form {
+        display: grid;
+        margin: 10px;
+    }
+
+    label {
+        margin: 5px;
+    }
+
+    input {
+        margin: 5px;
+    }
+
     /* Header */
 
     .page-header {
@@ -376,6 +394,7 @@ truncated when they become too long.
         input[type="submit"] {
             width: 100%;
         }
+
 
         /*
 

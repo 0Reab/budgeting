@@ -68,14 +68,19 @@ def stats():
 
 @app.route('/add-income', methods=['GET'])
 def income_template():
-    return render_template('home.html', categories_income=categories_income, msg='Add your income.')
+    ''' Show form for adding income '''
+    # broken atm need to figure out the form submit flow and not have it change href to /api
+    # but stay rather and refresh template
+    referer = request.headers.get("Referer")
+
+    msg = 'Succes! Add more income.' if referer == '/api/insert/income' else 'Add income.'
+
+    return render_template('home.html', categories_income=categories_income, msg=msg)
 
 
 @app.route('/api/insert/income', methods=['POST'])
 def income():
     ''' Add data to income table. NEED TO CHECK IF DATE FORMAT IS THE SAME AS RECEIPTS! -> frontend form is mm/dd/yyy'''
-
-    # category, description, converted_amount, link, amount, currency, date
 
     converted_amount = request.form['converted_amount']
     description = request.form['description']
@@ -95,11 +100,13 @@ def income():
         date
     )
 
-    msg = f'{'ok' if ok else 'error'}'
+    msg = 'Successful submit.' if ok else ''
+    # msg = f'{'ok' if ok else 'error'}'
+    # return jsonify(
+    #     {'status': msg}
+    # )
 
-    return jsonify(
-        {'status': msg}
-    )
+    return render_template('home.html', msg=msg)
 
 
 @app.route('/api/delete', methods=['DELETE'])
@@ -130,12 +137,15 @@ def delete_entry():
     )
 
 
-@app.route('/saved', methods=['GET'])
-def saved():
+@app.route('/show/<table>', methods=['GET'])
+def show_data(table):
     """ display DB entries """
 
-    msg = 'All database entries.'
-    entries = show_db()
+    if table not in ['expenses', 'income']:
+        return render_template('home.html', err_msg=f"Table {table} doesn't exist")
+
+    msg = f'Showing {table}'
+    entries = show_db(table)
 
     return render_template('home.html', db_result=entries, msg=msg)
 

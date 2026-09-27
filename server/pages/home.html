@@ -30,19 +30,19 @@
                 </div>
             </form>
             <div class="upload-row">
-                <button type="button" class="saved-button" id="add-income-button">
-                    Add income 
+                <button type="button" class="saved-button" id="add-income-button" style="background-color: lightgreen;">
+                    Add Income
                 </button>
 
-                <button type="button" class="saved-button" id="show-income-button">
-                    Show income 
+                <button type="button" class="saved-button" id="show-income-button" style="background-color: lightblue;">
+                    View income 
                 </button>
 
-                <button type="button" class="saved-button" id="saved-button">
-                    View all expenses
+                <button type="button" class="saved-button" id="saved-button" style="background-color: lightblue;">
+                    View expenses
                 </button>
 
-                <button type="button" class="saved-button" id="renderBtn">
+                <button type="button" class="saved-button" id="renderBtn" style="background-color: lightsalmon;">
                     Monthly expenses
                 </button>
             </div>
@@ -78,58 +78,62 @@
                 </div>
             </div>
 
-            <form style="display: none;" id="add-income-form" method="POST" action="/api/insert/income">
-                    <label for="category">Category</label>
+            <form style="display: none;" class="income-form" id="add-income-form" method="POST" action="/api/insert/income">
+                    <div class="income-form">
+                    <label for="category">Category:
                     <select id="category" name="category" required>
                         {% for category in categories_income %}
                             <option value="{{ category }}">{{ category }}</option>
                         {% endfor %}
-                    </select>
+                    </select></label>
 
-                    <label for="description">Description</label>
+                    <input id="converted_amount" name="converted_amount" type="hidden" value="1337">
+
+                    <label for="link">Link:
                     <input
-                        id="description"
-                        name="description"
-                        type="text"
-                        maxlength="100"
-                        required
-                    >
-
-                    <input id="converted_amount" name="converted_amount" type="hidden">
-
-                    <label for="link">Link</label>
-                    <input
+                        style="display: inline-block;"
                         id="link"
                         name="link"
                         type="url"
                         placeholder="Paste link"
-                    >
+                    ><button id="paste">Paste!</button></label>
 
-                    <label for="amount">Amount</label>
+                    <label for="amount">Amount:
                     <input
                         id="amount"
                         name="amount"
                         type="number"
                         step="any"
                         required
-                    >
+                    ></label>
 
-                    <label for="currency">Currency</label>
+                    <label for="currency">Currency:
                     <select id="currency" name="currency" required>
                         <option value="RSD">RSD</option>
                         <option value="USD">USD</option>
                         <option value="GBP">GBP</option>
-                    </select>
+                    </select></label>
 
-                    <label for="date">Date</label>
+                    <label for="date">Date:
                     <input
                         id="date"
                         name="date"
                         type="date"
                         required
-                    >
-                <button class="send-income-button" type="submit">Submit</button>
+                    ></label>
 
+                    <label for="description">Description:</label>
+                    <textarea
+                        id="description"
+                        name="description"
+                        type="text"
+                        maxlength="100"
+                        rows=1
+                        cols=10
+                        required
+                    ></textarea>
+                <button style="margin-top: 10px;" class="send-income-button" id="submit-income-button" type="submit">Submit</button>
+                </div>
             </form>
 
             <form id="categories-form" method="POST" action="/categories">
@@ -140,11 +144,20 @@
                             <tr>
                                 <th class="edits" style="display: none">Edit</th>
                                 <th class="edits" style="display: none">ID</th>
-                                <th>Category</th>
-                                <th>Name</th>
-                                <th>Total</th>
-                                <th>Qty</th>
-                                <th>Date</th>
+
+                                <th class="e">Category</th>
+                                <th class="e">Name</th>
+                                <th class="e">Total</th>
+                                <th class="e">Qty</th>
+                                <th class="e">Date</th>
+
+                                <th class="i">Category</th>
+                                <th class="i">Amount</th>
+                                <th class="i">Currency</th>
+                                <th class="i">Description</th>
+                                <th class="i">Link</th>
+                                <th class="i">In RSD</th>
+                                <th class="i">Date</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -177,26 +190,60 @@
                                     <span class="table-value" data-field="categ"></span>
                                     {% endif %}
                                 </td>
+                                <!-- expneses table rows -->
+
                                 <!-- Name -->
-                                <td class="name-cell">
+                                <td class="name-cell e">
                                     <span class="table-value" data-field="name"></span>
                                 </td>
                                 <!-- Total -->
-                                <td>
+                                <td class="e">
                                     <span class="table-value" data-field="total"></span>
                                 </td>
                                 <!-- Quantity -->
-                                <td>
+                                <td class="e">
                                     <span class="table-value" data-field="qty"></span>
                                 </td>
                                 <!-- Date -->
-                                <td>
+                                <td class="e">
                                     <span class="table-value" data-field="date"></span>
                                 </td>
                                 <!-- Submitted category -->
-                                <td>
+                                <td class="e">
                                     <input type="hidden" name="categories[]" value="">
                                 </td>
+
+<!-- 'ID - categ - description - converted_amount - link - amount - currency - date'
+                                <!-- income table rows -->
+                                <!-- Amount -->
+                                <td class="i">
+                                    <span class="table-value" data-field="amount"></span>
+                                </td>
+                                <!-- Currency -->
+                                <td class="i">
+                                    <span class="table-value" data-field="currency"></span>
+                                </td>
+                                <!-- Desc -->
+                                <td class="name-cell i">
+                                    <span class="table-value" data-field="description"></span>
+                                </td>
+                                <!-- Link -->
+                                <td class="name-cell i">
+                                    <span class="table-value" data-field="link"></span>
+                                </td>
+                                <!-- Conver -->
+                                <td class="i">
+                                    <span class="table-value" data-field="converted_amount"></span>
+                                </td>
+                                <!-- Date -->
+                                <td class="i">
+                                    <span class="table-value" data-field="date"></span>
+                                </td>
+                                <!-- Submitted category -->
+                                <td class="i">
+                                    <input type="hidden" name="categories[]" value="">
+                                </td>
+                                <!-- id, categ, desc, conv, link, amount, curr, date -->
                             </tr>
                             {% endfor %}
                         </tbody>

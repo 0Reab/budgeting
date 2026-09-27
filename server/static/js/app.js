@@ -33,6 +33,12 @@ function main() {
 
 // helper shorthanders lel
 
+async function paste(input) {
+    const text = await navigator.clipboard.readText();
+    input.value = text;
+}
+
+
 function showElementId(name, targetStyle = 'inline') {
     const element = document.getElementById(name);
 
@@ -59,6 +65,14 @@ function showElementsClass(name) {
     });
 }
 
+function hideElementsClass(name) {
+    let selector = '.' + name;
+    let elements = document.querySelectorAll(selector);
+
+    elements.forEach(element => {
+        element.style.display = 'none';
+    })
+}
 
 // income form and more
 
@@ -104,6 +118,9 @@ function setupNavigation() {
     const title = document.querySelector(".mc");
     const savedButton = document.getElementById("saved-button");
     const incomeButton = document.getElementById("add-income-button");
+    const incomeForm = document.getElementById("add-income-form")
+    const submitIncomeButton = document.getElementById("submit-income-button");
+    const showIncomeButton = document.getElementById("show-income-button");
     const deleteButton = document.getElementById("delete-button");
     const editButton = document.getElementById("edit-button");
 
@@ -115,7 +132,13 @@ function setupNavigation() {
 
     if (savedButton) {
         savedButton.addEventListener("click", () => {
-            window.location.href = "/saved";
+            window.location.href = "/show/expenses";
+        });
+    }
+
+    if (showIncomeButton) {
+        showIncomeButton.addEventListener("click", () => {
+            window.location.href = "/show/income";
         });
     }
 
@@ -137,6 +160,18 @@ function setupNavigation() {
             showElementId('delete-button');
             showElementsClass('edits');
         })
+    }
+
+    if (submitIncomeButton) {
+        submitIncomeButton.addEventListener("click", () => {
+            incomeForm.submit();
+        })
+    }
+
+    if (window.location.pathname === '/show/income') {
+        hideElementsClass('e');
+    } else if (window.location.pathname === '/show/expenses') {
+        hideElementsClass('i');
     }
 }
 

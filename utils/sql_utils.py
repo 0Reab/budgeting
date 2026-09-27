@@ -105,7 +105,10 @@ def validate(category: str, name: str, price: float, amount: float, date: str, c
             log_fail(f'Failed currency={currency} not in {currencies}')
             return False
 
-        if not link.startswith('https://') or not link.startswith('http://'):
+        is_link = link.startswith('https://') or link.startswith('http://')
+
+        # allow empty str, or if it starts as http URL
+        if is_link or link != '':
             log_fail(f'Failed link={link} is not https or http')
             return False
 
@@ -144,7 +147,7 @@ def insert_expense(i: list) -> bool:
 
 
 def insert_income(category, description, converted_amount, link, amount, currency, date):
-    #                            bug bounty  XSS         50,000           http  500      $       2026...
+    #                            bug bounty  XSS         50,000           http  500      USD     2026...
     query = 'INSERT INTO income (category, description, converted_amount, link, amount, currency, date) VALUES (?, ?, ?, ?, ?, ?, ?)'
     data = (category, description, converted_amount, link, amount, currency, date)
     conn, cursor = sql()
@@ -156,7 +159,7 @@ def insert_income(category, description, converted_amount, link, amount, currenc
         date=date,
         currency=currency,
         link=link,
-        valid_list=categories_income,
+        valid_categ=categories_income,
         name=description  # 100 char limit
     )
 
@@ -209,9 +212,14 @@ def db_delete(id: str) -> bool:
     return True
 
 
-def show_db() -> list:
+def show_db(table: str) -> list:
     """ formatted print of all table entries to stdout """
-    query = 'SELECT * FROM expenses'
+
+    if table not in ['expenses', 'income']:
+        log('fail', 'show_db()', f'SQL print db table {table} is not a valid table.')
+        return []
+
+    query = f'SELECT * FROM {table}'
 
     _conn, cursor = sql()
     try:
@@ -227,10 +235,17 @@ def show_db() -> list:
 
     log('ok', 'show_db()', 'SQL print db')
 
-    for entry in db:
-        line = f'ID - {entry[0]} | categ - {entry[1]} | name - {entry[2]} | total - {entry[3]} | qty - {entry[4]} | date - {entry[5]}'
-        result.append(line)
+    if table == 'expenses':
+        for entry in db:
+            line = f'ID - {entry[0]} | categ - {entry[1]} | name - {entry[2]} | total - {entry[3]} | qty - {entry[4]} | date - {entry[5]}'
+            result.append(line)
 
+    elif table == 'income':
+        for entry in db:
+            line = f'ID - {entry[0]} | categ - {entry[1]} | description - {entry[2]} | converted_amount - {entry[3]} | link - {entry[4]} | amount - {entry[5]} | currency - {entry[6]} | date - {entry[7]}'
+            result.append(line)
+
+    # id, categ, desc, conv, link, amount, curr, date = entry
     return result
 
 
