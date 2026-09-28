@@ -80,11 +80,13 @@ def in_categories(test, valid_categ: list) -> str | None:
         return None
 
 
-def validate(category: str, name: str, price: float, amount: float, date: str, currency: str, link: str, valid_categ: list) -> bool:
+def validate(category: str, name: str, price: float, amount: float, date: str, currency: str = None, link: str = None, valid_categ: list = None) -> bool:
     """
     Main validation func of all insert(i) parameters
     return True for successful validation otherwise False
     """
+    # [FAIL] in validate() - Other validation error - argument of type 'NoneType' is not a container or iterable
+    # [FAIL] in extract() - data validation
 
     log_fail = lambda msg: log('fail', 'validate()', msg)
 
@@ -101,16 +103,19 @@ def validate(category: str, name: str, price: float, amount: float, date: str, c
             log_fail(f'Failed name or date name={name} ; date={date}')
             return False
 
-        if currency not in currencies:
-            log_fail(f'Failed currency={currency} not in {currencies}')
-            return False
+        skip_extra_checks = currency is None or link is None or valid_categ is None
 
-        is_link = link.startswith('https://') or link.startswith('http://')
+        if not skip_extra_checks:
+            if currency not in currencies:
+                log_fail(f'Failed currency={currency} not in {currencies}')
+                return False
 
-        # allow empty str, or if it starts as http URL
-        if is_link or link != '':
-            log_fail(f'Failed link={link} is not https or http')
-            return False
+            is_link = link.startswith(('https://', 'http://'))
+
+            # allow empty str, or if it starts as http URL
+            if is_link or link != '':
+                log_fail(f'Failed link={link} is not https or http')
+                return False
 
     except Exception as e:
         log_fail(f'Other validation error - {e}')
@@ -129,7 +134,7 @@ def insert_expense(i: list) -> bool:
     query = 'INSERT INTO expenses (category, name, price, amount, date) VALUES (?, ?, ?, ?, ?)'
     data = (category, name, price, amount, date)
 
-    if validate(category, name, price, amount, date) is not True:
+    if validate(category, name, price, amount, date, valid_categ=categories_expenses) is not True:
         log('fail', 'insert()', 'SQL insert query validation')
         return False
     try:

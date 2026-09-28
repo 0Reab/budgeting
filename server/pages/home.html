@@ -32,6 +32,7 @@
                     <span>Uploading...</span>
                 </div>
             </form>
+            <p style="margin-top: 10px; margin-bottom: 10px;">Organize and view.</p>
             <div class="upload-row">
                 <button type="button" class="saved-button" id="add-income-button" style="background-image: linear-gradient(to bottom right, lightgreen, yellow);">
                     &#x1f4b0; Add Income
@@ -49,16 +50,6 @@
                     &#128202; Monthly expenses
                 </button>
             </div>
-            <button id='edit-button'
-                style="background-color: lightblue; display: none; margin: 5px;">&#x270E; Edit</button>
-
-            <button id="delete-button"
-                style="background-color: darkred; display: none; margin: 5px;">&#x1F5D1; Delete</button>
-            <button id="undo-button" class="edits"
-                style="background-color: dimgray; display: none; margin: 5px;">&#9100; Undo</button>
-
-            <script>
-            </script>
         </section>
         <!-- Messages -->
         {% if msg %}
@@ -73,11 +64,22 @@
         </div>
         {% endif %}
         <!-- Entries -->
-        <section class="card entries-card">
+        <section class="card entries-card" id="entries-card" style="display: none;">
+
             <div class="section-header">
                 <div>
                     <h2>Entries</h2>
                     <p>Your saved expenses.</p>
+                </div>
+
+                <div>
+                <button id='edit-button'
+                    style="background-color: lightblue; display: none; margin: 5px;">&#x270E; Edit</button>
+
+                <button id="delete-button"
+                    style="background-color: darkred; display: none; margin: 5px;">&#x1F5D1; Delete</button>
+                <button id="undo-button" class="edits"
+                    style="background-color: dimgray; display: none; margin: 5px;">&#9100; Undo</button>
                 </div>
             </div>
 
@@ -190,7 +192,7 @@
                                         </div>
                                     </div>
                                     {% else %}
-                                    <span class="table-value" data-field="categ"></span>
+                                    <span class="table-value" data-field="categ" style="text-wrap: nowrap"></span>
                                     {% endif %}
                                 </td>
                                 <!-- expneses table rows -->
@@ -212,7 +214,7 @@
                                     <span class="table-value" data-field="date"></span>
                                 </td>
                                 <!-- Submitted category -->
-                                <td class="e">
+                                <td class="e" style="display: none;">
                                     <input type="hidden" name="categories[]" value="">
                                 </td>
 
@@ -239,13 +241,11 @@
                                     <span class="table-value" data-field="converted_amount"></span>
                                 </td>
                                 <!-- Date -->
-                                <td class="i">
+                                <td class="i" style="display: block; text-wrap: nowrap">
                                     <span class="table-value" data-field="date"></span>
                                 </td>
                                 <!-- Submitted category -->
-                                <td class="i">
-                                    <input type="hidden" name="categories[]" value="">
-                                </td>
+                                <!-- <td class="i"><input type="hidden" name="categories[]" value=""></td> -->
                                 <!-- id, categ, desc, conv, link, amount, curr, date -->
                             </tr>
                             {% endfor %}
@@ -266,8 +266,8 @@
         </section>
         <div class="container">
 
-            <button id="myChartScroll" onclick="window.scrollTo(0,0);"
-                    style="display: none; background-image: linear-gradient(to bottom right, #ffa671, #ff6767);">Scroll to the top.</button>
+            <button id="myChartScroll" onclick="window.scrollTo({top: 0, behavior: 'smooth'});"
+                    style="display: none; background-image: linear-gradient(to bottom right, #ffa671, #ff6767);">&#129145; Scroll to the top.</button>
             <canvas id="myChart"></canvas>
 
         </div>

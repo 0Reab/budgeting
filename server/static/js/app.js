@@ -22,12 +22,22 @@ document.addEventListener("DOMContentLoaded", () => {
 });
 
 function main() {
-    if (window.location.pathname === '/saved') {
-        showElementId('edit-button', '');
+    if (window.location.pathname != '/') {
+        showElementId('entries-card', 'block', true)
+        document.getElementById("entries-card").scrollIntoView();
+    }
+
+    if (window.location.pathname === '/show/income') {
+        showElementId('edit-button', 'inline', false);
+    }
+
+    if (window.location.pathname === '/show/expenses') {
+        showElementId('edit-button', 'inline', false);
+        // showElementId('add-income-form');
     }
 
     if (window.location.pathname === '/add-income') {
-        showElementId('add-income-form', 'grid');
+        showElementId('add-income-form');
     }
 
     // restore scroll on location change
@@ -53,7 +63,7 @@ async function paste(input) {
 }
 
 
-function showElementId(name, targetStyle = 'inline') {
+function showElementId(name, targetStyle = 'inline', toggle = true) {
     const element = document.getElementById(name);
 
     if (!element) {
@@ -61,6 +71,10 @@ function showElementId(name, targetStyle = 'inline') {
         return;
     } 
 
+    if (!toggle) {
+        element.style.display = targetStyle;
+        return;
+    }
     element.style.display =
         element.style.display === 'none' ? targetStyle : 'none';
 }
@@ -186,7 +200,9 @@ function setupNavigation() {
 
     if (loc === '/show/income') {
         hideElementsClass('e');
-    } else if (window.location.pathname === '/show/expenses') {
+    } else if (loc === '/show/expenses') {
+        hideElementsClass('i');
+    } else if (loc === '/upload') {
         hideElementsClass('i');
     }
 

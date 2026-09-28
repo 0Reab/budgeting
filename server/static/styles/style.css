@@ -36,6 +36,12 @@
 
     /* Header */
 
+    .section-header {
+        display: flex; 
+        justify-content: space-between;
+        align-items: center;
+    }
+
     .page-header {
         margin-bottom: 20px;
     }

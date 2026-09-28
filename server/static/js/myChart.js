@@ -26,6 +26,7 @@ $("#renderBtn").click(
         labels =  ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
 
         renderChart(data_all, labels);
-        window.scrollTo(0, document.body.scrollHeight); // scroll to the char
+        window.scrollTo({top: document.body.scrollHeight, behavior: 'smooth'});
+        //window.scrollTo(0, document.body.scrollHeight); // scroll to the chart
     }
 );
