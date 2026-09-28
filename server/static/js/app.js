@@ -29,6 +29,20 @@ function main() {
     if (window.location.pathname === '/add-income') {
         showElementId('add-income-form', 'grid');
     }
+
+    // restore scroll on location change
+    // Source - https://stackoverflow.com/a/63687846
+    // Posted by James Ashwood Retrieved 2026-09-28, License - CC BY-SA 4.0
+    window.onunload = function() {
+        localStorage.setItem("scrollY", window.scrollY);
+    }
+
+    window.onload = function() {
+        var scrollY = parseInt(localStorage.getItem("scrollY"));
+        if (!isNaN(scrollY)) {
+            window.scroll(0, scrollY);
+        }
+    }
 }
 
 // helper shorthanders lel
@@ -115,6 +129,8 @@ async function deleteSelected() {
 /* Navigation */
 
 function setupNavigation() {
+    const loc = document.location.pathname;
+
     const title = document.querySelector(".mc");
     const savedButton = document.getElementById("saved-button");
     const incomeButton = document.getElementById("add-income-button");
@@ -168,10 +184,14 @@ function setupNavigation() {
         })
     }
 
-    if (window.location.pathname === '/show/income') {
+    if (loc === '/show/income') {
         hideElementsClass('e');
     } else if (window.location.pathname === '/show/expenses') {
         hideElementsClass('i');
+    }
+
+    if (loc != '/') {
+        document.getElementById("myChartScroll").style.display = 'inline';
     }
 }
 

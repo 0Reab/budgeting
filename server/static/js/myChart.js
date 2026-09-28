@@ -14,6 +14,7 @@ function renderChart(data, labels) {
         },
         options: {scales:{yAxes:[{ticks:{beginAtZero:true}}]}}
     });
+    document.getElementById("myChartScroll").style.display = 'inline';
 }
 
 $("#renderBtn").click(
@@ -25,5 +26,6 @@ $("#renderBtn").click(
         labels =  ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
 
         renderChart(data_all, labels);
+        window.scrollTo(0, document.body.scrollHeight); // scroll to the char
     }
 );

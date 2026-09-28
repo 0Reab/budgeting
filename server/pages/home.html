@@ -12,7 +12,10 @@
 <body>
     <div class="container">
         <header class="page-header">
-            <h1 class="mc">Budgeting app</h1>
+            <div class="header-row">
+                <h1 class="mc">Budgeting app</h1>
+                <h2 class="balance" id="balance" style="text-align: right; width:">$3324.51</h2>
+            </div>
             <p>Upload a receipt and organise your expenses.</p>
         </header>
         <!-- Upload -->
@@ -30,29 +33,29 @@
                 </div>
             </form>
             <div class="upload-row">
-                <button type="button" class="saved-button" id="add-income-button" style="background-color: lightgreen;">
-                    Add Income
+                <button type="button" class="saved-button" id="add-income-button" style="background-image: linear-gradient(to bottom right, lightgreen, yellow);">
+                    &#x1f4b0; Add Income
                 </button>
 
-                <button type="button" class="saved-button" id="show-income-button" style="background-color: lightblue;">
-                    View income 
+                <button type="button" class="saved-button" id="show-income-button" style="background-image: linear-gradient(to bottom right, #50a7f4, #5bf0ff);">
+                    &#x1F440; View income 
                 </button>
 
-                <button type="button" class="saved-button" id="saved-button" style="background-color: lightblue;">
-                    View expenses
+                <button type="button" class="saved-button" id="saved-button" style="background-image: linear-gradient(to bottom right, #50a7f4, #5bf0ff);">
+                    &#x1F440; View expenses
                 </button>
 
-                <button type="button" class="saved-button" id="renderBtn" style="background-color: lightsalmon;">
-                    Monthly expenses
+                    <button type="button" class="saved-button" id="renderBtn" style="background-image: linear-gradient(to bottom right, #ffa671, #ff6767);">
+                    &#128202; Monthly expenses
                 </button>
             </div>
             <button id='edit-button'
-                style="background-color: lightblue; display: none; margin: 5px;">Edit</button>
+                style="background-color: lightblue; display: none; margin: 5px;">&#x270E; Edit</button>
 
             <button id="delete-button"
-                style="background-color: darkred; display: none; margin: 5px;">Delete</button>
+                style="background-color: darkred; display: none; margin: 5px;">&#x1F5D1; Delete</button>
             <button id="undo-button" class="edits"
-                style="background-color: dimgray; display: none; margin: 5px;">Undo</button>
+                style="background-color: dimgray; display: none; margin: 5px;">&#9100; Undo</button>
 
             <script>
             </script>
@@ -262,7 +265,11 @@
             </form>
         </section>
         <div class="container">
+
+            <button id="myChartScroll" onclick="window.scrollTo(0,0);"
+                    style="display: none; background-image: linear-gradient(to bottom right, #ffa671, #ff6767);">Scroll to the top.</button>
             <canvas id="myChart"></canvas>
+
         </div>
     </div>
     <script src="/static/js/app.js"></script>

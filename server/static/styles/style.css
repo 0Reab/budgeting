@@ -37,7 +37,13 @@
     /* Header */
 
     .page-header {
-        margin-bottom: 28px;
+        margin-bottom: 20px;
+    }
+
+    .header-row {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
     }
 
     .mc {
@@ -90,7 +96,7 @@
     }
 
     input[type="file"] {
-        flex: 1;
+        /* flex: 1; */
         min-width: 0;
         padding: 9px;
         border: 1px solid #ddd;
@@ -132,8 +138,14 @@
         cursor: wait;
     }
 
+    button:hover,
+    input[type="button"]:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 6px 8px rgba(0, 0, 0, 0.33);
+    }
+
     .saved-button {
-        width: 100%;
+        /* width: 100%; */
         margin-top: 12px;
         background: #fff;
         color: #222;
@@ -228,7 +240,7 @@
     }
 
     .entries-table td {
-        padding: 13px 10px;
+        padding: 7px 5px;
         vertical-align: middle;
         border-bottom: 1px solid #eee;
     }
