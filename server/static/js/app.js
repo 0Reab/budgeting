@@ -22,21 +22,23 @@ document.addEventListener("DOMContentLoaded", () => {
 });
 
 function main() {
-    if (window.location.pathname != '/') {
+    let loc = window.location.pathname;
+
+    if (loc != '/') {
         showElementId('entries-card', 'block', true)
-        document.getElementById("entries-card").scrollIntoView();
+        document.getElementById("entries-card").scrollIntoView({behavior: "smooth"});
     }
 
-    if (window.location.pathname === '/show/income') {
+    if (loc === '/show/income') {
         showElementId('edit-button', 'inline', false);
     }
 
-    if (window.location.pathname === '/show/expenses') {
+    if (loc === '/show/expenses') {
         showElementId('edit-button', 'inline', false);
         // showElementId('add-income-form');
     }
 
-    if (window.location.pathname === '/add-income') {
+    if (loc === '/add-income') {
         showElementId('add-income-form');
     }
 

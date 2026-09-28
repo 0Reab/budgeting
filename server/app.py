@@ -30,7 +30,12 @@ def allowed_file(filename):
 
 @app.errorhandler(405)
 def method_not_allowed():
-    return render_template('home.html', err='Wrong HTTP method')
+    return render_template('home.html', err='Error 405: Method not allowed.'), 405
+
+
+@app.errorhandler(404)
+def not_found(error):
+    return render_template('home.html', err='Error 404: Not found.'), 404
 
 
 @app.route('/', methods=['GET'])
@@ -119,7 +124,6 @@ def delete_entry():
         return jsonify({'error': "There are duplicate IDs in your query."}), 400
 
     if len(id_list) > 50 or len(id_list) <= 0:
-        print(len(id_list))
         return jsonify({'error': "Amount of IDs to delete must be x > 0 and x < 50"}), 400
 
     # add tons of validation of user input from id_list later
@@ -156,17 +160,15 @@ def categories_post():
 
     global items
     err_msg = "Error in data insertion, try again."
-    err_status = 400
 
     user_categs = request.form.getlist("categories[]")
-    msg = 'Success :)'
 
     # prevent insert when item buffer is empty (global var)
     # or item tags length do not match with items
 
     if not items or len(items) != len(user_categs) or '' in user_categs:
         log('fail', 'categories_post()', f'invalid data in user_categs = {user_categs}')
-        return render_template('home.html', db_result=items, msg=err_msg, edit='yes', categories=categories_expenses), err_status
+        return render_template('home.html', db_result=items, msg=err_msg, edit='yes', categories=categories_expenses), 400
 
     for item in items:
         # update category with user input and insert in db
@@ -176,7 +178,7 @@ def categories_post():
 
     items = []  # clear global buffer
 
-    return render_template('home.html', msg=msg)
+    return render_template('home.html', msg='Success :)')
 
 
 @app.route('/upload', methods=['POST'])

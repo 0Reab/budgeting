@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <link rel="stylesheet" href="/static/styles/style.css">
+    <title>Budgeting app</title>
+</head>
+
+<body>
+    <div class="container">
+        <header class="page-header">
+            <div class="header-row">
+                <h1 class="mc">Budgeting app</h1>
+                <h2 class="balance" id="balance" style="text-align: right; width:">$3324.51</h2>
+            </div>
+            <p>Upload a receipt and organise your expenses.</p>
+        </header>
+        <!-- Upload -->
+        <section class="card">
+            <h2>Upload receipt</h2>
+            <p>Choose an image to add a new entry.</p>
+            <form id="upload-form" action="/upload" method="post" enctype="multipart/form-data">
+                <div class="upload-row">
+                    <input type="file" id="myFile" name="file">
+                    <input id="upload-button" type="submit" value="Upload">
+                </div>
+                <div id="upload-status" class="upload-status">
+                    <span class="spinner"></span>
+                    <span>Uploading...</span>
+                </div>
+            </form>
+            <p style="margin-top: 10px; margin-bottom: 10px;">Organize and view.</p>
+            <div class="upload-row">
+                <button type="button" class="saved-button green-button" id="add-income-button">
+                    &#x1f4b0; Add Income
+                </button>
+
+                <button type="button" class="saved-button blue-button" id="show-income-button">
+                    &#x1F440; View income 
+                </button>
+
+                <button type="button" class="saved-button blue-button" id="saved-button">
+                    &#x1F440; View expenses
+                </button>
+
+                    <button type="button" class="saved-button red-button" id="renderBtn">
+                    &#128202; Monthly expenses
+                </button>
+            </div>
+        </section>
+        <!-- Messages -->
+        {% if msg %}
+        <div class="message">
+            {{ msg }}
+        </div>
+        {% endif %}
+
+        {% if err %}
+        <div class="error">
+            {{ err }}
+        </div>
+        {% endif %}
+        <!-- Entries -->
+        <section class="card entries-card" id="entries-card" style="display: none;">
+
+            <div class="section-header">
+                <div>
+                    <h2>Entries</h2>
+                    <p>Your saved expenses.</p>
+                </div>
+
+                <div>
+                <button id="edit-button" class="saved-button blue-button"
+                    style="display: none; margin: 5px;">Edit</button>
+
+                <button id="delete-button" class="saved-button red-button"
+                    style="display: none; margin: 5px;">Delete</button>
+
+                <button id="undo-button" class="saved-button yellow-button"
+                    style="display: none; margin: 5px;">Undo</button>
+                </div>
+            </div>
+
+            <form style="display: none;" class="income-form" id="add-income-form" method="POST" action="/api/insert/income">
+                    <div class="income-form">
+                    <label for="category">Category:
+                    <select id="category" name="category" required>
+                        {% for category in categories_income %}
+                            <option value="{{ category }}">{{ category }}</option>
+                        {% endfor %}
+                    </select></label>
+
+                    <input id="converted_amount" name="converted_amount" type="hidden" value="1337">
+
+                    <label for="link">Link:
+                    <input
+                        style="display: inline-block;"
+                        id="link"
+                        name="link"
+                        type="url"
+                        placeholder="Paste link"
+                    ><button id="paste">Paste!</button></label>
+
+                    <label for="amount">Amount:
+                    <input
+                        id="amount"
+                        name="amount"
+                        type="number"
+                        step="any"
+                        required
+                    ></label>
+
+                    <label for="currency">Currency:
+                    <select id="currency" name="currency" required>
+                        <option value="RSD">RSD</option>
+                        <option value="USD">USD</option>
+                        <option value="GBP">GBP</option>
+                    </select></label>
+
+                    <label for="date">Date:
+                    <input
+                        id="date"
+                        name="date"
+                        type="date"
+                        required
+                    ></label>
+
+                    <label for="description">Description:</label>
+                    <textarea
+                        id="description"
+                        name="description"
+                        type="text"
+                        maxlength="100"
+                        rows=1
+                        cols=10
+                        required
+                    ></textarea>
+                <button style="margin-top: 10px;" class="send-income-button" id="submit-income-button" type="submit">Submit</button>
+                </div>
+            </form>
+
+            <form id="categories-form" method="POST" action="/categories">
+                {% if db_result %}
+                <div class="table-wrapper">
+                    <table class="entries-table">
+                        <thead>
+                            <tr>
+                                <th class="edits" style="display: none">Edit</th>
+                                <th class="edits" style="display: none">ID</th>
+
+                                <th class="e">Category</th>
+                                <th class="e">Name</th>
+                                <th class="e">Total</th>
+                                <th class="e">Qty</th>
+                                <th class="e">Date</th>
+
+                                <th class="i">Category</th>
+                                <th class="i">Amount</th>
+                                <th class="i">Currency</th>
+                                <th class="i">Description</th>
+                                <th class="i">Link</th>
+                                <th class="i">In RSD</th>
+                                <th class="i">Date</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for entry in db_result %}
+                            <tr class="entry-row" data-entry="{{ entry | e }}">
+                                <!-- ID selector -->
+                                <td class="edits" style="display: none">
+                                    <input type="checkbox" onclick="selectID(this)">
+                                </td>
+                                <!-- ID -->
+                                <td class="edits" style="display: none">
+                                    <span class="table-value" data-field="id"></span>
+                                </td>
+                                <!-- Category -->
+                                <td>
+                                    {% if edit %}
+                                    <div class="dropdown">
+                                        <button type="button" class="dropbtn">
+                                            Select
+                                        </button>
+                                        <div class="dropdown-content">
+                                            {% for cat in categories %}
+                                            <a href="#" data-cat="{{ cat }}">
+                                                {{ cat }}
+                                            </a>
+                                            {% endfor %}
+                                        </div>
+                                    </div>
+                                    {% else %}
+                                    <span class="table-value" data-field="categ" style="text-wrap: nowrap"></span>
+                                    {% endif %}
+                                </td>
+                                <!-- expneses table rows -->
+
+                                <!-- Name -->
+                                <td class="name-cell e">
+                                    <span class="table-value" data-field="name"></span>
+                                </td>
+                                <!-- Total -->
+                                <td class="e">
+                                    <span class="table-value" data-field="total"></span>
+                                </td>
+                                <!-- Quantity -->
+                                <td class="e">
+                                    <span class="table-value" data-field="qty"></span>
+                                </td>
+                                <!-- Date -->
+                                <td class="e">
+                                    <span class="table-value" data-field="date"></span>
+                                </td>
+                                <!-- Submitted category -->
+                                <td class="e" style="display: none;">
+                                    <input type="hidden" name="categories[]" value="">
+                                </td>
+
+<!-- 'ID - categ - description - converted_amount - link - amount - currency - date'
+                                <!-- income table rows -->
+                                <!-- Amount -->
+                                <td class="i">
+                                    <span class="table-value" data-field="amount"></span>
+                                </td>
+                                <!-- Currency -->
+                                <td class="i">
+                                    <span class="table-value" data-field="currency"></span>
+                                </td>
+                                <!-- Desc -->
+                                <td class="name-cell i">
+                                    <span class="table-value" data-field="description"></span>
+                                </td>
+                                <!-- Link -->
+                                <td class="name-cell i">
+                                    <span class="table-value" data-field="link"></span>
+                                </td>
+                                <!-- Conver -->
+                                <td class="i">
+                                    <span class="table-value" data-field="converted_amount"></span>
+                                </td>
+                                <!-- Date -->
+                                <td class="i" style="display: block; text-wrap: nowrap">
+                                    <span class="table-value" data-field="date"></span>
+                                </td>
+                                <!-- Submitted category -->
+                                <!-- <td class="i"><input type="hidden" name="categories[]" value=""></td> -->
+                                <!-- id, categ, desc, conv, link, amount, curr, date -->
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                {% if edit %}
+                <button class="send-button" type="submit">
+                    Save categories
+                </button>
+                {% endif %}
+                {% else %}
+                <div class="empty">
+                    No entries yet.
+                </div>
+                {% endif %}
+            </form>
+        </section>
+        <div class="container">
+
+            <button id="myChartScroll" onclick="window.scrollTo({top: 0, behavior: 'smooth'});"
+                    style="display: none; background-image: linear-gradient(to bottom right, #ffa671, #ff6767);">&#129145; Scroll to the top.</button>
+            <canvas id="myChart"></canvas>
+
+        </div>
+    </div>
+    <script src="/static/js/app.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.7.2/Chart.js"></script>
+    <script src="https://code.jquery.com/jquery-3.3.1.min.js"></script>
+    <script src="/static/js/myChart.js"></script>
+</body>
+
+</html>

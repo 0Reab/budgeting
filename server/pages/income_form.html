@@ -1,0 +1,57 @@
+            <form style="display: none;" class="income-form" id="add-income-form" method="POST" action="/api/insert/income">
+                <div class="income-form">
+                    <label for="category">Category:
+                    <select id="category" name="category" required>
+                        {% for category in categories_income %}
+                            <option value="{{ category }}">{{ category }}</option>
+                        {% endfor %}
+                    </select></label>
+
+                    <input id="converted_amount" name="converted_amount" type="hidden" value="1337">
+
+                    <label for="link">Link:
+                    <input
+                        style="display: inline-block;"
+                        id="link"
+                        name="link"
+                        type="url"
+                        placeholder="Paste link"
+                    ><button id="paste">Paste!</button></label>
+
+                    <label for="amount">Amount:
+                    <input
+                        id="amount"
+                        name="amount"
+                        type="number"
+                        step="any"
+                        required
+                    ></label>
+
+                    <label for="currency">Currency:
+                    <select id="currency" name="currency" required>
+                        <option value="RSD">RSD</option>
+                        <option value="USD">USD</option>
+                        <option value="GBP">GBP</option>
+                    </select></label>
+
+                    <label for="date">Date:
+                    <input
+                        id="date"
+                        name="date"
+                        type="date"
+                        required
+                    ></label>
+
+                    <label for="description">Description:</label>
+                    <textarea
+                        id="description"
+                        name="description"
+                        type="text"
+                        maxlength="100"
+                        rows=1
+                        cols=10
+                        required
+                    ></textarea>
+                    <button style="margin-top: 10px;" class="send-income-button" id="submit-income-button" type="submit">Submit</button>
+                </div>
+            </form>

@@ -6,19 +6,32 @@ Upload photos of receipts for quick and easy personal budgeting.
 
 This application parses the QR code from the receipt photo.<br>
 And allows you to annotate each item with custom category eg. food or bills.<br>
-Saves the items in the SQL table designed for later analysis of cost or spending habits.
+Saves the items in the SQL table designed for later analysis of cost or spending habits.<br>
+Includes features like adding your income, graphs, tables, balance tracking and editing.
 
 ### Dependencies
 
 * Flask - python web server
 * MySql - Database
 * QReader - QR code reader
+* Docker - Optional for containerization
 
-### Installing
+### Setup
 
 * Clone the repository ```git clone <url>``` (main branch).
-* Install dependencies ```pip install -r requirements.txt``` (not yet added!).
-* Run the server ```python -m server.app```.
+* Navigate to project ```cd budgeting-main```.
+
+### Run with Docker
+
+* Build image ```docker build -t budgeting:latest .```.
+* Run the server ```docker run -p 1337:1337 budgeting:latest .```.
+
+### Or run with venv 
+
+* Create environment ```python -m venv .venv```.
+* Activate venv ```source .venv/bin/activate``` or on windows ```.venv\Scripts\Activate.ps1```.
+* Install dependencies ```pip install -r requirements.txt```.
+* Run the server (default port 1337) ```python -m server.app```.
 
 ### Security note
 

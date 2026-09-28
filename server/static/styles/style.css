@@ -118,7 +118,8 @@
         border: none;
         border-radius: 7px;
         padding: 10px 15px;
-        background: #222;
+        /*background: #222;*/
+        background-image: linear-gradient(to bottom right, #6c71aa, #2c2737);
         color: #fff;
         font-size: 14px;
         font-weight: 500;
@@ -127,10 +128,11 @@
             background 0.15s ease,
             transform 0.1s ease;
     }
-
+    
     button:hover,
     input[type="submit"]:hover {
-        background: #444;
+        transform: translateY(-4px);
+        box-shadow: 0 6px 8px rgba(0, 0, 0, 0.33);
     }
 
     button:active,
@@ -144,12 +146,6 @@
         cursor: wait;
     }
 
-    button:hover,
-    input[type="button"]:hover {
-        transform: translateY(-4px);
-        box-shadow: 0 6px 8px rgba(0, 0, 0, 0.33);
-    }
-
     .saved-button {
         /* width: 100%; */
         margin-top: 12px;
@@ -159,12 +155,32 @@
     }
 
     .saved-button:hover {
-        background: #f5f5f5;
+        /*background: #f5f5f5; */
     }
 
     .send-button {
         width: 100%;
         margin-top: 16px;
+    }
+
+    .green-button{
+        background-image: linear-gradient(to bottom right, lightgreen, yellow);
+    }
+
+    .blue-button{
+        background-image: linear-gradient(to bottom right, #50a7f4, #5bf0ff);
+    }
+
+    .red-button{
+        background-image: linear-gradient(to bottom right, #ffa671, #ff6767);
+    }
+
+    .yellow-button{
+        background-image: linear-gradient(to bottom right, #fdffaf, #ffcb00);
+    }
+
+    .black-button{
+        background-image: linear-gradient(to bottom right, #6c71aa, #2c2737);
     }
 
     /* Messages */
