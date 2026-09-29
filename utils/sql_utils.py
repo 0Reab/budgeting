@@ -56,6 +56,25 @@ def sql_error_handler(error) -> None:
         raise Exception('database blew up.')
 
 
+def execute(cursor, query, conn=None, data=None):
+    try:
+        if data:
+            cursor.execute(query, data)
+        else:
+            cursor.execute(query)
+
+    except sqlite3.OperationalError as e:
+        sql_error_handler(error=e)
+
+        if data:
+            cursor.execute(query, data)
+        else:
+            cursor.execute(query)
+
+    if conn:
+        conn.commit()
+
+
 def insert_expense(i: list) -> bool:
     """ add entry to DB table with last validation step """
 
@@ -68,15 +87,8 @@ def insert_expense(i: list) -> bool:
     if validate(category, name, price, amount, date, valid_categ=categories_expenses) is not True:
         log('fail', 'insert query validation')
         return False
-    try:
-        cursor.execute(query, data)
-        conn.commit()
 
-    except sqlite3.OperationalError as e:
-        sql_error_handler(error=e)
-
-        cursor.execute(query, data)
-        conn.commit()
+    execute(cursor, query, conn, data)
 
     log('info', f'{name}')
     return True
@@ -105,15 +117,7 @@ def insert_income(category, description, converted_amount, link, amount, currenc
     date = f"{'.'.join(date.split('-')[::-1])}."  # convert date to dd.mm.yyyy. format
     data = (category, description, converted_amount, link, amount, currency, date)
 
-    try:
-        cursor.execute(query, data)
-        conn.commit()
-
-    except sqlite3.OperationalError as e:
-        sql_error_handler(error=e)
-
-        cursor.execute(query, data)
-        conn.commit()
+    execute(cursor, query, conn, data)
 
     log('info', f'insert {category} of {amount} {currency}')
     return True
@@ -164,13 +168,8 @@ def show_db(table: str) -> list:
     query = f'SELECT * FROM {table}'
 
     _conn, cursor = sql()
-    try:
-        cursor.execute(query)
 
-    except sqlite3.OperationalError as e:
-        sql_error_handler(error=e)
-
-        cursor.execute(query)
+    execute(cursor, query)
 
     db = cursor.fetchall()
     result = []
@@ -213,15 +212,8 @@ def show_sum_of(time_type: str, categories: list, count: int):
     # but i also gotta sum each month - should be easy, *.9.2025 so anything that satisfies this i gues, take total values and sum
 
     query = 'SELECT FROM expenses WHERE date = (?)'
-
     _conn, cursor = sql()
-    try:
-        cursor.execute(query)
-
-    except sqlite3.OperationalError as e:
-        sql_error_handler(error=e)
-
-        cursor.execute(query)
+    execute(cursor, query)
 
 
 def show_categories() -> None:
