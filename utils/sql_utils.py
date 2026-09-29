@@ -86,7 +86,6 @@ def insert_expense(i: list) -> bool:
 def insert_income(category, description, converted_amount, link, amount, currency, date):
     #                            bug bounty  XSS         50,000           http  500      USD     2026...
     query = 'INSERT INTO income (category, description, converted_amount, link, amount, currency, date) VALUES (?, ?, ?, ?, ?, ?, ?)'
-    data = (category, description, converted_amount, link, amount, currency, date)
     conn, cursor = sql()
 
     valid = validate(
@@ -105,6 +104,7 @@ def insert_income(category, description, converted_amount, link, amount, currenc
         return False
 
     date = f"{'.'.join(date.split('-')[::-1])}."  # convert date to dd.mm.yyyy. format
+    data = (category, description, converted_amount, link, amount, currency, date)
 
     try:
         cursor.execute(query, data)
