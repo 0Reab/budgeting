@@ -15,19 +15,19 @@ def validate_url(url: str) -> bool:
     xss_strings = ''  # this check is not secure at all + false positives... xss_strings = r';%3B<>%3C%3E'
 
     if url is None:
-        log('fail', 'validate_url()', "Didn't find URL in QR code.")
+        log('fail', "Didn't find URL in QR code.")
         return False
 
     if not url.startswith(valid):
-        log('fail', 'validate_url()', f'Invalid url: {url}')
+        log('fail', f'Invalid url: {url}')
         return False
 
     for char in url:
         if char in xss_strings:
-            log('fail', 'validate_url()', f'XSS strings found in: {url}')
+            log('fail', f'XSS str found in: {url}')
             return False
 
-    log('ok', 'validate_url()', f'url validated: {url}')
+    log('ok', f'url validated: {url}')
     return True
 
 
@@ -35,19 +35,19 @@ def fetch(url: str) -> str | None:
     """ HTTP GET url response -> BeautifulSoup finds <pre> tags -> return string of tag values """
 
     if not validate_url(url):
-        log('fail', 'fetch()', 'failed vaildation')
+        log('fail', f'failed validation url: {url}')
         return None
 
     try:
         result = requests.get(url).content
     except Exception as e:
-        log('fail', 'fetch()', f'URL get request failed with error - {e}')
+        log('fail', f'URL get request failed with error - {e}')
         return None
 
     soup = BeautifulSoup(result, features="html.parser")
     response = soup.find_all("pre", {"style": "font-family:monospace"})
 
-    log('ok', 'fetch()', 'http response bs4')
+    log('ok', 'http response bs4')
     return response
 
 
@@ -58,10 +58,10 @@ def get_date(txt: str) -> str | None:
         if 'vreme:' in ln or 'време:' in ln:
             date = ln.split()[-2]
 
-            log('ok', 'get_date()', f'found date = {date}')
-            return date 
+            log('ok', f'found date = {date}')
+            return date
 
-    log('fail', 'get_date()', 'did not find date')
+    log('fail', 'did not find date')
     return None
 
 
@@ -104,13 +104,13 @@ def parse(response: str) -> list[dict[str, str]] | None:
         return None
 
     try:
-        lines = [l.strip() for l in raw.splitlines() if l.strip()]
+        lines = [i.strip() for i in raw.splitlines() if i.strip()]
         items = receit_regex(lines, date)
 
     except Exception as e:
-        log('fail', 'parse()', f'html soupe parser failed, good luck - {e}')
+        log('fail', f'html soupe parser failed, good luck - {e}')
 
-    log('ok', 'parse()', 'receipt html soup parsed')
+    log('ok', 'receipt html soup parsed')
     return items
 
 
@@ -118,23 +118,23 @@ def parse_image_path(img: str) -> str | bool:
     """ validate file extension to a whitelist of allowed """
     # check path traversal with regex
 
-    bad_chars = '$;|#&+"'
+    bad_chars = '$;|#&+"\n\r\t'
 
-    for char in img:
-        if char in bad_chars:
-            log('fail', 'parse_image_path()', 'Image filepath contains possibly malicious characters')
+    for char in bad_chars:
+        if char in img:
+            log('fail', 'Image filepath contains possibly malicious chars.')
             return False
 
     try:
         img_ext = img.split('.')[-1]
-        allowed_ext = ['jpg', 'png']
+        allowed_ext = ['jpg', 'png', 'jpeg']
 
         if img_ext not in allowed_ext or len(img) > 100:
-            log('fail', 'parse_image_path()', f'Image argument {img} not jpg or png filetype')
+            log('fail', f'Image {img} not jpg/jpeg/png')
             return False
 
     except Exception as e:
-        log('fail', 'parse_image_path()', f'Image argument {img}: caused undefined exception {e}')
+        log('fail', f'Image argument {img}: exception {e}')
 
-    log('ok', 'parse_image_path()', 'valid extension')
+    log('ok', 'valid extension')
     return img

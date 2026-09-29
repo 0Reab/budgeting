@@ -2,7 +2,7 @@ import os
 from flask import render_template, request, flash, redirect, jsonify, url_for
 
 from utils.sql_utils import show_db, insert_expense, categories_expenses, categories_income, show_sum_of, db_delete, insert_income
-from utils.backend_utils import read_key, allowed_file, run_backend
+from utils.backend_utils import read_key, allowed_file, process_image
 from utils.logger import log
 from utils.validation import has_dupes
 from flask import Flask
@@ -171,9 +171,16 @@ def categories_post():
     # or item tags length do not match with items
 
     if not items or len(items) != len(user_categs) or '' in user_categs:
-        log('fail', 'categories_post()', f'invalid data in user_categs = {user_categs}')
-        print(f'debugging :c -> len(items)={len(items)} ; len(user_categs)={len(user_categs)}')
-        return render_template('home.html', db_result=items, msg=err_msg, edit='yes', categories=categories_expenses), 400
+
+        log('fail', f'invalid data in user_categs = {user_categs} ; items = {items}')
+
+        return render_template(
+            'home.html',
+            db_result=items,
+            msg=err_msg,
+            edit='yes',
+            categories=categories_expenses
+        ), 400
 
     for item in items:
         # update category with user input and insert in db
@@ -183,7 +190,6 @@ def categories_post():
 
     items = []  # clear global buffer
 
-    # return render_template('home.html', msg='Success :)')
     msg = 'Successful submit.'
     return redirect(url_for('show_table_data', table='expenses', status=msg))
 
@@ -203,7 +209,7 @@ def upload():
         return redirect('/')
 
     if file and allowed_file(file.filename):
-        result = run_backend(file)
+        result = process_image(file)
 
         if result:
             global items

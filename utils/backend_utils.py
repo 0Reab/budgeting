@@ -21,7 +21,7 @@ def allowed_file(filename):
         filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
 
 
-def run_backend(file) -> bool | list:
+def process_image(file) -> bool | list:
     """ image processing and calling backend processor """
 
     filename = secure_filename(file.filename)
@@ -30,7 +30,7 @@ def run_backend(file) -> bool | list:
     os.makedirs(img_path, exist_ok=True)
     file.save(os.path.join(img_path, filename))
 
-    log('ok', 'upload()', 'Image post request')
+    log('ok', 'Image post request')
 
     # global items
     filepath = f'{img_path}/{filename}'
@@ -43,7 +43,8 @@ def run_backend(file) -> bool | list:
 
     result = []
     for entry in items:
-        line = f'ID - / | categ - {entry[0]} | name - {entry[1]} | total - {entry[2]} | qty - {entry[3]} | date - {entry[4]}'
+        categ, name, total, qty, date = entry
+        line = f'ID - / | categ - {categ} | name - {name} | total - {total} | qty - {qty} | date - {date}'
         result.append(line)
 
     return result, items

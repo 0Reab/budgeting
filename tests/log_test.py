@@ -19,7 +19,7 @@ def test_log():
     for level in log_levels:
         for data in fuzz_data:
 
-            return_val = log(log_type=level, func=data, message=data, suppress_print=True)
+            return_val = log(log_type=level, message=data, suppress_print=True)
 
             output_str = f'log(level, data, data) ; level = {level}, data = {data} ; {return_val}'
 

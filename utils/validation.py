@@ -33,7 +33,7 @@ def in_categories(test, valid_categ: list) -> str | None:
         if test in valid_categ:
             return test
 
-        log('fail', 'in_categories()', f'validate {test} ; {type(test)}')
+        log('fail', f'validate {test} ; {type(test)}')
         return None
 
 
@@ -46,7 +46,7 @@ def validate(category: str, name: str, price: float, amount: float, date: str, c
     # refactor into cleaner and decoupled logic pls
     # break it up kinda
 
-    log_fail = lambda msg: log('fail', 'validate()', msg)
+    log_fail = lambda msg: log('fail', msg)
 
     try:
         if in_categories(category, valid_categ) is None:
@@ -86,5 +86,5 @@ def validate(category: str, name: str, price: float, amount: float, date: str, c
         log_fail(f'Other validation error - {e}')
         return False
 
-    log('ok', 'validate()', f'{category} ; {name}')
+    log('ok', f'{category} ; {name}')
     return True

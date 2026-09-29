@@ -4,7 +4,7 @@ from tests.parse_test import *
 """ Script to run all tests not implemented yet """
 
 test_log()
-log('ok', 'log()', 'all passed')
+log('ok', 'all passed')
 
 test_fetch()
-log('ok', 'fetch()', 'all passed')
+log('ok', 'all passed')

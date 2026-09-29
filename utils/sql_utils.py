@@ -7,6 +7,29 @@ from utils.validation import categories_expenses, categories_income, currencies
 """ Module for: SQL queries, utilities, , formmated prints, DB connection object """
 
 
+table_expenses = """
+    CREATE TABLE IF NOT EXISTS expenses (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        category TEXT,
+        name TEXT,
+        price REAL,
+        amount REAL,
+        date TEXT
+    )"""
+
+table_income = """
+    CREATE TABLE IF NOT EXISTS income (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        category TEXT,
+        description TEXT,
+        converted_amount REAL,
+        link TEXT,
+        amount REAL,
+        currency CHAR(3),
+        date TEXT
+    )"""
+
+
 def sql() -> tuple:
     """ create cursor and SQL DB connection """
 
@@ -19,41 +42,17 @@ def sql_error_handler(error) -> None:
     conn, cursor = sql()
 
     if 'no such table: expenses' in str(error):
-        cursor.execute("""
-        CREATE TABLE IF NOT EXISTS expenses (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            category TEXT,
-            name TEXT,
-            price REAL,
-            amount REAL,
-            date TEXT
-        )
-        """)
-
+        cursor.execute(table_expenses)
         conn.commit()
-        log('info', 'sql_error_handler()',
-            'SQL -> (had to create default expenses table)')
+        log('info', 'had to create default expenses table')
 
     elif 'no such table: income' in str(error):
-        cursor.execute("""
-        CREATE TABLE IF NOT EXISTS income (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            category TEXT,
-            description TEXT,
-            converted_amount REAL,
-            link TEXT,
-            amount REAL,
-            currency CHAR(3),
-            date TEXT
-        )
-        """)
-
+        cursor.execute(table_income)
         conn.commit()
-        log('info', 'sql_error_handler()',
-            'SQL -> (had to create default income table)')
+        log('info', 'had to create default income table')
+
     else:
-        log('fail', 'sql_error_handler()',
-            'SQL -> unhandled sql error')
+        log('fail', 'unhandled sql error')
         raise Exception('database blew up.')
 
 
@@ -67,7 +66,7 @@ def insert_expense(i: list) -> bool:
     data = (category, name, price, amount, date)
 
     if validate(category, name, price, amount, date, valid_categ=categories_expenses) is not True:
-        log('fail', 'insert()', 'SQL insert query validation')
+        log('fail', 'insert query validation')
         return False
     try:
         cursor.execute(query, data)
@@ -79,7 +78,7 @@ def insert_expense(i: list) -> bool:
         cursor.execute(query, data)
         conn.commit()
 
-    log('info', 'insert_expense()', f'SQL -> {name}')
+    log('info', f'{name}')
     return True
 
 
@@ -100,7 +99,7 @@ def insert_income(category, description, converted_amount, link, amount, currenc
     )
 
     if not valid:
-        log('fail', 'insert_income()', 'Not inserting in DB, validation failed')
+        log('fail', 'Not inserting in DB, validation failed')
         return False
 
     date = f"{'.'.join(date.split('-')[::-1])}."  # convert date to dd.mm.yyyy. format
@@ -116,7 +115,7 @@ def insert_income(category, description, converted_amount, link, amount, currenc
         cursor.execute(query, data)
         conn.commit()
 
-    log('info', 'insert_income()', f'SQL -> {category} of {amount} {currency}')
+    log('info', f'insert {category} of {amount} {currency}')
     return True
 
 
@@ -130,7 +129,7 @@ def db_delete(id: str) -> bool:
 
     if id == '*':
         cursor.execute("DELETE FROM expenses")
-        log('ok', 'delete()', 'SQL database wipe')
+        log('ok', 'database wipe')
         return True
     else:
         try:
@@ -140,17 +139,17 @@ def db_delete(id: str) -> bool:
             id_nums = [row[0] for row in rows]
 
             if int(id) not in id_nums:
-                log('fail', 'delete()', f'not found id={id} in DB')
+                log('fail', f'not found id={id} in DB')
                 return False
 
             cursor.execute("DELETE FROM expenses WHERE id = (?)", [id])
 
         except (sqlite3.ProgrammingError, ValueError, TypeError) as e:
-            log('fail', 'delete()', f'sql query error with id={id} - {e}')
+            log('fail', f'query error with id={id} - {e}')
             return False
 
     conn.commit()
-    log('ok', 'delete()', f'SQL deleted entry ID {id}')
+    log('ok', f'deleted entry ID {id}')
 
     return True
 
@@ -159,7 +158,7 @@ def show_db(table: str) -> list:
     """ formatted print of all table entries to stdout """
 
     if table not in ['expenses', 'income']:
-        log('fail', 'show_db()', f'SQL print db table {table} is not a valid table.')
+        log('fail', f'{table} is not a valid table.')
         return []
 
     query = f'SELECT * FROM {table}'
@@ -176,16 +175,18 @@ def show_db(table: str) -> list:
     db = cursor.fetchall()
     result = []
 
-    log('ok', 'show_db()', 'SQL print db')
+    log('ok', 'print db')
 
     if table == 'expenses':
         for entry in db:
-            line = f'ID - {entry[0]} | categ - {entry[1]} | name - {entry[2]} | total - {entry[3]} | qty - {entry[4]} | date - {entry[5]}'
+            id, categ, name, total, qty, date = entry  # should change these to classes yeh?
+            line = f'ID - {id} | categ - {categ} | name - {name} | total - {total} | qty - {qty} | date - {date}'
             result.append(line)
 
     elif table == 'income':
         for entry in db:
-            line = f'ID - {entry[0]} | categ - {entry[1]} | description - {entry[2]} | converted_amount - {entry[3]} | link - {entry[4]} | amount - {entry[5]} | currency - {entry[6]} | date - {entry[7]}'
+            id, categ, desc, conver, link, amount, curr, date = entry  # should change these to classes yeh?
+            line = f'ID - {id} | categ - {categ} | description - {desc} | converted_amount - {conver} | link - {link} | amount - {amount} | currency - {curr} | date - {date}'
             result.append(line)
 
     # id, categ, desc, conv, link, amount, curr, date = entry
@@ -226,8 +227,7 @@ def show_sum_of(time_type: str, categories: list, count: int):
 def show_categories() -> None:
     """ print global categories to stdout """
 
-    log('ok', 'show_categories()', 'DB categories')
-    print()
+    log('ok', 'DB categories')
 
     for idx, cat in enumerate(categories_income):
         print(f'{cat} - {idx}')
@@ -240,4 +240,4 @@ def con_close():
     conn, _cursor = sql()
     conn.close()
 
-    log('info', 'con_close()', 'closing connection')
+    log('info', 'closing connection')

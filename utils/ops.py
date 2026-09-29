@@ -25,16 +25,16 @@ def extract(item) -> list | None:
             date = data['date']
 
             if validate(category, name, price, amount, date, valid_categ=categories_expenses) is False:
-                log('fail', 'extract()', 'data validation')
+                log('fail', 'data validation')
                 return None
 
             result.append([category, name, price, amount, date])
 
-        log('ok', 'extract()', 'data extraction')
+        log('ok', 'data extraction')
         return result
 
     except Exception as e:
-        log('fail', 'extract()', f'generic exception clause - {e}')
+        log('fail', f'generic exception clause - {e}')
         return None
 
 
@@ -53,6 +53,6 @@ def image_scan(img_path: str) -> list:
     raw = parse(data)
     result = extract(raw)
 
-    log('ok', 'image_scan()', 'xd')
+    log('ok', 'veri gud')
 
     return result

@@ -1,22 +1,22 @@
+import inspect
+
 
 """ Module for custom logging of application operations and errors """
 # implement saving logs to a file
 
 
-def log(log_type: str, func: str, message: str, **kwargs) -> bool | None:
+def log(log_type: str, message: str, **kwargs) -> bool | None:
     """
     main logging func - formatted and colored print: args -> function calls with log type and custom messages
     log_type = OK, FAIL, INFO, END, rest is arbitrary text.
     """
-    # "func" argument is a hardcoded string which can be inaccurate if actual func name is changed. 
-    # for eg. log('ok', 'parser()', 'parsing of text') is bad if parser() was renamed into parsing_text().
-
     suppress_print = kwargs.get('suppress_print', None)
+
+    # get func name of the caller
+    func = inspect.currentframe().f_back.f_code.co_name
 
     if not validate_call(log_type, message):
         return None
-
-    # log output
 
     color = {
         'OK': '\033[92m',
@@ -34,25 +34,22 @@ def log(log_type: str, func: str, message: str, **kwargs) -> bool | None:
     return True
 
 
-def validate_call(log_type: str, message: str) -> bool | None:
+def validate_call(log_type: str, message: str) -> bool:
     """ log() argument validation """
 
     bad_call = f'Bad func call: Invalid log type for: {log_type} ; with message ; {message}'
-
-    def fail():
-        print(bad_call)
-        return None
 
     try:
         log_type = log_type.upper()
 
     except AttributeError as e:
-        return fail()
+        print(f'{bad_call} - {e}')
+        return False
 
-    log_levels = [ 'INFO', 'OK', 'FAIL' ]
+    log_levels = ['INFO', 'OK', 'FAIL']
 
     if log_type not in log_levels:
-        print(bad_call) 
-        return None
+        print(bad_call)
+        return False
 
     return True
