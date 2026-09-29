@@ -19,6 +19,7 @@ function renderChart(data, labels) {
 
 $("#renderBtn").click(
     function () {
+        document.getElementById("myChart").style.display = 'inline';
         data = [110000,100000,80000,160000,160000,140000,130000,190000,180000,160000,110000,130200];
         data_2 = [100000,140000,90000,130000,180000,150000,130000,170000,140000,150000,100000,140200];
         data_all = [data, data_2]

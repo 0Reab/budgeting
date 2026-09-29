@@ -1,6 +1,6 @@
 import os
 
-from flask import Flask, render_template, request, flash, redirect, jsonify
+from flask import Flask, render_template, request, flash, redirect, jsonify, url_for
 from werkzeug.utils import secure_filename
 
 from utils.sql_utils import show_db, insert_expense, categories_expenses, categories_income, show_sum_of, db_delete, insert_income
@@ -111,7 +111,8 @@ def income():
     #     {'status': msg}
     # )
 
-    return render_template('home.html', msg=msg)
+    # return render_template('home.html', msg=msg)
+    return redirect(url_for('show_table_data', table='income', status=msg))
 
 
 @app.route('/api/delete', methods=['DELETE'])
@@ -142,13 +143,15 @@ def delete_entry():
 
 
 @app.route('/show/<table>', methods=['GET'])
-def show_data(table):
+def show_table_data(table):
     """ display DB entries """
 
     if table not in ['expenses', 'income']:
         return render_template('home.html', err_msg=f"Table {table} doesn't exist")
 
-    msg = f'Showing {table}'
+    status = request.args.get('status')
+
+    msg = 'Success :)' if status else f'Showing {table}'
     entries = show_db(table)
 
     return render_template('home.html', db_result=entries, msg=msg)
@@ -178,7 +181,9 @@ def categories_post():
 
     items = []  # clear global buffer
 
-    return render_template('home.html', msg='Success :)')
+    # return render_template('home.html', msg='Success :)')
+    msg = 'Successful submit.'
+    return redirect(url_for('show_table_data', table='expenses', status=msg))
 
 
 @app.route('/upload', methods=['POST'])
@@ -217,7 +222,7 @@ def run_backend(file):
     if items is None:
         return render_template('home.html', err="No URL found in QR code.")
 
-    print(f'DEBUGGING -> {items}')
+    # print(f'DEBUGGING -> {items}')
 
     result = []
     for entry in items:

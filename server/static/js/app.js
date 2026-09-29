@@ -24,11 +24,6 @@ document.addEventListener("DOMContentLoaded", () => {
 function main() {
     let loc = window.location.pathname;
 
-    if (loc != '/') {
-        showElementId('entries-card', 'block', true)
-        document.getElementById("entries-card").scrollIntoView({behavior: "smooth"});
-    }
-
     if (loc === '/show/income') {
         showElementId('edit-button', 'inline', false);
     }
@@ -49,11 +44,18 @@ function main() {
         localStorage.setItem("scrollY", window.scrollY);
     }
 
+    /* obsolete, maybe needs revisit for this whole scrolling thing idek 
     window.onload = function() {
         var scrollY = parseInt(localStorage.getItem("scrollY"));
         if (!isNaN(scrollY)) {
             window.scroll(0, scrollY);
         }
+    }
+    */
+    // scroll at the end of everything loading - no lag
+    if (loc != '/') {
+        showElementId('entries-card', 'block', true)
+        document.getElementById("entries-card").scrollIntoView({behavior: "smooth"});
     }
 }
 
