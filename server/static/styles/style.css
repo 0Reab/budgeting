@@ -457,3 +457,164 @@ Slightly tighter table on phones.
     }
 
 /* animations n stuff */
+
+.hover-shadow:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 6px 8px rgba(0, 0, 0, 0.33);
+}
+
+.hover-pop:hover {
+    transform: translateY(-4px);
+}
+
+.dropdown-content {
+    transform-origin: top;
+    animation: openDropdown .1s ease;
+}
+
+.scale-in {
+    animation: scaleIn .3s ease;
+}
+
+.fade-in {
+    animation: fadeIn .3s ease;
+}
+
+.fade-in-slow {
+    animation: fadeIn .5s ease;
+}
+
+.appear-from-above {
+    animation: appearFromAbove .5s ease-out;
+}
+
+.appear-from-below {
+    animation: appearFromBelow .5s ease-out;
+}
+
+.glow-up {
+    transition: all 0.1s ease-in-out;
+}
+
+.glow-up:hover {
+    color: blue;
+}
+
+/* example for hover on/off */
+.lighten {
+    transition: all 0.3s ease-in-out;
+}
+.lighten:hover {
+    color: midnightblue;
+}
+/* end */
+
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+@keyframes appearFromAbove {
+    from {
+        opacity: 0;
+        transform: translateY(-100px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+@keyframes appearFromBelow {
+    from {
+        opacity: 0;
+        transform: translateY(+100px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+@keyframes scaleIn {
+    from {
+        scale: 0;
+    }
+    to {
+        scale: 1;
+    }
+}
+
+@keyframes openDropdown {
+    from {
+        transform: scale(1,0);
+    }
+    to {
+        transform: scale(1,1);
+    }
+}
+
+/* income form */
+
+.income-form {
+    max-width: 420px;
+    margin: 20px auto;
+    padding: 20px;
+    display: contents;
+    flex-direction: column;
+    gap: 14px;
+
+    background: #fff;
+    border: 1px solid #ddd;
+    border-radius: 10px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+}
+
+.income-form label {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-weight: 500;
+}
+
+.income-form input,
+.income-form select,
+.income-form textarea {
+    flex: 1;
+    min-width: 0;
+                padding: 8px 10px;
+
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    background: #fafafa;
+
+    font: inherit;
+    box-sizing: border-box;
+}
+
+.income-form input:focus,
+.income-form select:focus,
+.income-form textarea:focus {
+    outline: none;
+    border-color: #666;
+    background: #fff;
+}
+
+.income-form textarea {
+    width: 100%;
+    resize: vertical;
+}
+
+#link {
+    min-width: 0;
+}
+
+#paste {
+    padding: 8px 12px;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    background: #eee;
+    cursor: pointer;
+}
+
+#paste:hover {
+    background: #ddd;
+}

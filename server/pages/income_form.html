@@ -1,46 +1,50 @@
-            <form style="display: none;" class="income-form" id="add-income-form" method="POST" action="/api/insert/income">
+            <form style="display: none;" class="income-form-fields" id="add-income-form" method="POST" action="/api/insert/income">
                 <div class="income-form">
-                    <label for="category">Category:
-                    <select id="category" name="category" required>
-                        {% for category in categories_income %}
-                            <option value="{{ category }}">{{ category }}</option>
-                        {% endfor %}
-                    </select></label>
+                    <div class="income-sub-form">
+                        <label style="width: fit-content" for="category">Category:
+                        <select id="category" name="category" class="" required>
+                            {% for category in categories_income %}
+                                <option value="{{ category }}">{{ category }}</option>
+                            {% endfor %}
+                        </select></label>
 
-                    <input id="converted_amount" name="converted_amount" type="hidden" value="1337">
+                        <input id="converted_amount" name="converted_amount" type="hidden" value="1337">
 
-                    <label for="link">Link:
-                    <input
-                        style="display: inline-block;"
-                        id="link"
-                        name="link"
-                        type="url"
-                        placeholder="Paste link"
-                    ><button id="paste">Paste!</button></label>
+                        <label style="width: fit-content" for="link">Link:
+                        <input
+                            style="display: inline-block;"
+                            id="link"
+                            name="link"
+                            type="url"
+                            placeholder="https://... (optional)"
+                            ><button class="black-button" id="paste">&#x1F4CB;</button></label>
 
-                    <label for="amount">Amount:
-                    <input
-                        id="amount"
-                        name="amount"
-                        type="number"
-                        step="any"
-                        required
-                    ></label>
+                        <label style="width: fit-content; display: contents;" for="amount">Amount:
+                        <input style="width: 100px"
+                            placeholder="0"
+                            id="amount"
+                            name="amount"
+                            type="number"
+                            step="any"
+                            min="0"
+                            required
+                        ></label>
 
-                    <label for="currency">Currency:
-                    <select id="currency" name="currency" required>
-                        <option value="RSD">RSD</option>
-                        <option value="USD">USD</option>
-                        <option value="GBP">GBP</option>
-                    </select></label>
+                        <label style="width: fit-content; display: contents;" for="currency">
+                        <select id="currency" name="currency" required>
+                            <option value="RSD">RSD</option>
+                            <option value="USD">USD</option>
+                            <option value="GBP">GBP</option>
+                        </select></label>
 
-                    <label for="date">Date:
-                    <input
-                        id="date"
-                        name="date"
-                        type="date"
-                        required
-                    ></label>
+                        <label style="width: fit-content" for="date">Date:
+                        <input
+                            id="date"
+                            name="date"
+                            type="date"
+                            required
+                        ></label>
+                    </div>
 
                     <label for="description">Description:</label>
                     <textarea

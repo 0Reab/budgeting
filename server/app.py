@@ -80,7 +80,13 @@ def income_template():
 
     msg = 'Succes! Add more income.' if referer == '/api/insert/income' else 'Add income.'
 
-    return render_template('home.html', categories_income=categories_income, msg=msg)
+    return render_template(
+        'home.html',
+        categories_income=categories_income,
+        msg=msg,
+        section_header='Income',
+        section_header_msg='Add your income details.'
+    )
 
 
 @app.route('/api/insert/income', methods=['POST'])
@@ -154,7 +160,13 @@ def show_table_data(table):
     msg = 'Success :)' if status else f'Showing {table}'
     entries = show_db(table)
 
-    return render_template('home.html', db_result=entries, msg=msg)
+    return render_template(
+        'home.html',
+        db_result=entries,
+        msg=msg,
+        section_header=table.capitalize(),
+        section_header_msg=f'View your {table} details.'
+    )
 
 
 @app.route('/categories', methods=['POST'])
@@ -230,7 +242,14 @@ def run_backend(file):
         result.append(line)
 
     return render_template(
-        'home.html', db_result=result, msg='Success', edit='yes', categories=categories_expenses)
+        'home.html',
+        db_result=result,
+        msg='Success',
+        edit='yes',
+        categories=categories_expenses,
+        section_header='Categorize entries',
+        section_header_msg='Choose a category from the dropdown menu.'
+    )
 
 
 if __name__ == '__main__':

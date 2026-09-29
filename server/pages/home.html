@@ -1,15 +1,20 @@
 {% extends "base.html" %} 
     {% block content %}
         <section class="card entries-card" id="entries-card" style="display: none;">
-
             <div class="section-header">
-                <div>
-                    <h2>Entries</h2>
-                    <p>Your saved expenses.</p>
-                </div>
+
+                {% if section_header %}
+                    <div>
+                        <h2>{{ section_header }}</h2>
+
+                        {% if section_header_msg %}
+                        <p>{{ section_header_msg }}</p>
+                        {% endif %}
+                    </div>
+                {% endif %}
 
                 <div>
-                <button id="edit-button" class="saved-button blue-button"
+                <button id="edit-button" class="saved-button blue-button scale-in"
                     style="display: none; margin: 5px;">Edit</button>
 
                 <button id="delete-button" class="saved-button red-button"
@@ -97,7 +102,7 @@
                 {% endif %}
                 {% else %}
                 <div class="empty">
-                    No entries yet.
+                    No entries yet. (fix me!)
                 </div>
                 {% endif %}
             </form>

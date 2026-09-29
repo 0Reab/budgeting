@@ -44,22 +44,33 @@ function main() {
         localStorage.setItem("scrollY", window.scrollY);
     }
 
-    /* obsolete, maybe needs revisit for this whole scrolling thing idek 
-    window.onload = function() {
-        var scrollY = parseInt(localStorage.getItem("scrollY"));
-        if (!isNaN(scrollY)) {
-            window.scroll(0, scrollY);
-        }
+    if (window.sessionStorage.getItem("playedAnimation") === null) {
+        playAnimations();
     }
-    */
+
     // scroll at the end of everything loading - no lag
     if (loc != '/') {
-        showElementId('entries-card', 'block', true)
-        document.getElementById("entries-card").scrollIntoView({behavior: "smooth"});
+        showElementId('entries-card', 'block', true);
+        element = document.getElementById("entries-card");
+
+        element.classList.add('fade-in-slow');
+        element.scrollIntoView({behavior: "smooth"});
     }
 }
 
 // helper shorthanders lel
+
+function playAnimations() {
+    //document.getElementById("").classList.add("scale-in");
+    $('.saved-button').addClass('scale-in');
+    $('.card').addClass('scale-in');
+
+    $('.header-text').addClass('scale-in');
+    $('.balance').addClass('appear-from-above');
+    $('.mc').addClass('appear-from-above');
+
+    window.sessionStorage.setItem("playedAnimation", 1);
+}
 
 async function paste(input) {
     const text = await navigator.clipboard.readText();
@@ -91,6 +102,7 @@ function showElementsClass(name) {
     elements.forEach(element => {
         if (element.style.display === 'none') {
             element.style.display = 'table-cell';
+            element.classList.add('fade-in');
         } else {
             element.style.display = 'none';
         }

@@ -13,10 +13,10 @@
     <div class="container">
         <header class="page-header">
             <div class="header-row">
-                <h1 class="mc">Budgeting app</h1>
-                <h2 class="balance" id="balance" style="text-align: right; width:">$3324.51</h2>
+                <h1 class="mc lighten hover-pop">Budgeting app</h1>
+                <h2 class="balance lighten hover-pop" id="balance" style="text-align: right; width:">$3324.51</h2>
             </div>
-            <p>Upload a receipt and organise your expenses.</p>
+            <p class="header-text">Upload a receipt and organise your expenses.</p>
         </header>
         <!-- Upload -->
         <section class="card">
@@ -46,20 +46,20 @@
                     &#x1F440; View expenses
                 </button>
 
-                    <button type="button" class="saved-button red-button" id="renderBtn">
+                <button type="button" class="saved-button red-button" id="renderBtn">
                     &#128202; Monthly expenses
                 </button>
             </div>
         </section>
         <!-- Messages -->
         {% if msg %}
-        <div class="message">
+        <div class="message fade-in scale-in notifiy">
             {{ msg }}
         </div>
         {% endif %}
 
         {% if err %}
-        <div class="error">
+        <div class="error fade-in scale-in notify">
             {{ err }}
         </div>
         {% endif %}
@@ -71,8 +71,9 @@
         <div class="container">
             <canvas id="myChart" style="display: none;"></canvas>
 
-            <button id="myChartScroll" onclick="window.scrollTo({top: 0, behavior: 'smooth'});"
-                    style="display: none; background-image: linear-gradient(to bottom right, #ffa671, #ff6767);">&#129145; Scroll to the top.</button>
+            <button id="myChartScroll" class="red-button"
+                    onclick="window.scrollTo({top: 0, behavior: 'smooth'});"
+                    style="display: none;">&#129145; Scroll to the top.</button>
 
         </div>
     </div>
