@@ -1,6 +1,6 @@
 import sqlite3
 from utils.logger import log
-from utils.validation import has_dupes, is_date, in_categories, validate
+from utils.validation import has_dupes, valid_date, in_categories, validate_insert_params
 from utils.validation import categories_expenses, categories_income, currencies
 
 
@@ -84,7 +84,7 @@ def insert_expense(i: list) -> bool:
     query = 'INSERT INTO expenses (category, name, price, amount, date) VALUES (?, ?, ?, ?, ?)'
     data = (category, name, price, amount, date)
 
-    if validate(category, name, price, amount, date, valid_categ=categories_expenses) is not True:
+    if validate_insert_params(category, name, price, amount, date, valid_categ=categories_expenses) is not True:
         log('fail', 'insert query validation')
         return False
 
@@ -99,7 +99,7 @@ def insert_income(category, description, converted_amount, link, amount, currenc
     query = 'INSERT INTO income (category, description, converted_amount, link, amount, currency, date) VALUES (?, ?, ?, ?, ?, ?, ?)'
     conn, cursor = sql()
 
-    valid = validate(
+    valid = validate_insert_params(
         category=category,
         price=converted_amount,
         amount=amount,

@@ -1,4 +1,4 @@
-from utils.validation import categories_expenses, validate
+from utils.validation import categories_expenses, validate_insert_params
 from utils.scanner import scan
 from utils.logger import log
 from utils.parse import parse, parse_image_path, fetch
@@ -24,7 +24,7 @@ def extract(item) -> list | None:
             name = data['name']
             date = data['date']
 
-            if validate(category, name, price, amount, date, valid_categ=categories_expenses) is False:
+            if validate_insert_params(category, name, price, amount, date, valid_categ=categories_expenses) is False:
                 log('fail', 'data validation')
                 return None
 
