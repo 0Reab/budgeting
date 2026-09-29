@@ -135,7 +135,7 @@ def delete_entry():
         if db_delete(id) is False:
             errors.append(f'Failed to delete id: {id}')
 
-    msg = f'{'error' if errors else 'ok'}'
+    msg = 'error' if errors else 'ok'
 
     return jsonify(
         {'status': msg, msg: errors}

@@ -24,7 +24,7 @@ Includes features like adding your income, graphs, tables, balance tracking and 
 ### Run with Docker
 
 * Build image ```docker build -t budgeting:latest .```.
-* Run the server ```docker run -p 1337:1337 budgeting:latest .```.
+* Run the server ```docker run -p 1337:1337 budgeting:latest```.
 
 ### Or run with venv 
 

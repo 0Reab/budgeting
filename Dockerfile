@@ -21,15 +21,17 @@ RUN apt-get update \
 
 # setup user
 RUN useradd -ms /bin/bash budgetapp
-USER budgetapp
 WORKDIR /home/budgetapp
 
 # install python packages & cpu only torch (ommit line if using gpu)
 COPY requirements.txt .
 RUN pip install torch torchvision --index-url https://download.pytorch.org/whl/cpu
 RUN pip install -r requirements.txt
+RUN python -c "import qreader as q ; q.QReader(model_size='l')" # download model
 
 COPY . .
+RUN chown -R budgetapp:budgetapp /home/budgetapp
+USER budgetapp
 
 # health check
 HEALTHCHECK --interval=1m --timeout=3s --retries=3 \
