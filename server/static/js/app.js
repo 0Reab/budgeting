@@ -169,6 +169,7 @@ function setupNavigation() {
     const showIncomeButton = document.getElementById("show-income-button");
     const deleteButton = document.getElementById("delete-button");
     const editButton = document.getElementById("edit-button");
+    const balance = document.getElementById("balance");
 
     if (title) {
         title.addEventListener("click", () => {
@@ -211,6 +212,12 @@ function setupNavigation() {
     if (submitIncomeButton) {
         submitIncomeButton.addEventListener("click", () => {
             incomeForm.submit();
+        })
+    }
+
+    if (balance) {
+        balance.addEventListener("click", () => {
+            balance.innerText = 'me change!';
         })
     }
 

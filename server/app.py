@@ -1,31 +1,17 @@
 import os
-
-from flask import Flask, render_template, request, flash, redirect, jsonify, url_for
-from werkzeug.utils import secure_filename
+from flask import render_template, request, flash, redirect, jsonify, url_for
 
 from utils.sql_utils import show_db, insert_expense, categories_expenses, categories_income, show_sum_of, db_delete, insert_income
-from utils.ops import image_scan
+from utils.backend_utils import read_key, allowed_file, run_backend
 from utils.logger import log
+from flask import Flask
 
 
-app = Flask(__name__, template_folder='pages')
-
-ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg'}
-app.config['UPLOAD_FOLDER'] = os.path.join(app.root_path, 'images')
+# mr global variable -> refactor later
 items = []
 
-
-def read_key():
-    """ read flask key from file """
-    with open('key.txt', 'r') as f:
-        key = f.read()
-    return key
-
-
-def allowed_file(filename):
-    """ file extension validation """
-    return '.' in filename and \
-        filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
+app = Flask(__name__, template_folder='pages')
+app.config['UPLOAD_FOLDER'] = os.path.join(app.root_path, 'images')
 
 
 @app.errorhandler(405)
@@ -183,6 +169,7 @@ def categories_post():
 
     if not items or len(items) != len(user_categs) or '' in user_categs:
         log('fail', 'categories_post()', f'invalid data in user_categs = {user_categs}')
+        print(f'debugging :c -> len(items)={len(items)} ; len(user_categs)={len(user_categs)}')
         return render_template('home.html', db_result=items, msg=err_msg, edit='yes', categories=categories_expenses), 400
 
     for item in items:
@@ -213,43 +200,22 @@ def upload():
         return redirect('/')
 
     if file and allowed_file(file.filename):
-        return run_backend(file)
+        result = run_backend(file)
 
-
-def run_backend(file):
-    """ image processing and calling backend processor """
-
-    filename = secure_filename(file.filename)
-    img_path = app.config['UPLOAD_FOLDER']
-
-    os.makedirs(img_path, exist_ok=True)
-    file.save(os.path.join(img_path, filename))
-
-    log('ok', 'upload()', 'Image post request')
-
-    filepath = f'{img_path}/{filename}'
-    global items
-    items = image_scan(filepath)
-
-    if items is None:
-        return render_template('home.html', err="No URL found in QR code.")
-
-    # print(f'DEBUGGING -> {items}')
-
-    result = []
-    for entry in items:
-        line = f'ID - / | categ - {entry[0]} | name - {entry[1]} | total - {entry[2]} | qty - {entry[3]} | date - {entry[4]}'
-        result.append(line)
-
-    return render_template(
-        'home.html',
-        db_result=result,
-        msg='Success',
-        edit='yes',
-        categories=categories_expenses,
-        section_header='Categorize entries',
-        section_header_msg='Choose a category from the dropdown menu.'
-    )
+        if result:
+            global items
+            db, items = result[0], result[1]
+            return render_template(
+                'home.html',
+                db_result=db,
+                msg='Success',
+                edit='yes',
+                categories=categories_expenses,
+                section_header='Categorize entries',
+                section_header_msg='Choose a category from the dropdown menu.'
+            )
+        else:
+            return render_template('home.html', err="No URL found in QR code.")
 
 
 if __name__ == '__main__':
