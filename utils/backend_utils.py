@@ -1,7 +1,6 @@
 import os
 from utils.ops import image_scan
 from utils.logger import log
-from utils.sql_utils import categories_expenses
 from flask import current_app
 from werkzeug.utils import secure_filename
 

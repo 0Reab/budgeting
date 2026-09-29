@@ -1,4 +1,4 @@
-from utils.sql_utils import validate, categories_expenses
+from utils.validation import categories_expenses, validate
 from utils.scanner import scan
 from utils.logger import log
 from utils.parse import parse, parse_image_path, fetch

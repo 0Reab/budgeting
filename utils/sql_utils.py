@@ -1,14 +1,10 @@
 import sqlite3
 from utils.logger import log
-# from datetime import datetime
+from utils.validation import has_dupes, is_date, in_categories, validate
+from utils.validation import categories_expenses, categories_income, currencies
 
 
-""" Module for: SQL queries, utilities, validation, formmated prints, DB connection object """
-
-
-categories_expenses = ['other', 'tool', 'food', 'transport', 'bill', 'cosmetic', 'nightout', 'hobby']
-categories_income = ['bug bounty', 'photoshop', 'modoolar']
-currencies = ['USD', 'GBP', 'RSD']  # USD, British pound, RSD
+""" Module for: SQL queries, utilities, , formmated prints, DB connection object """
 
 
 def sql() -> tuple:
@@ -61,70 +57,6 @@ def sql_error_handler(error) -> None:
         raise Exception('database blew up.')
 
 
-def in_categories(test, valid_categ: list) -> str | None:
-    """ Validation - if arg is in whitelist of array categories """
-    try:
-        idx = int(test)
-
-        if len(valid_categ) <= idx:
-            log('fail', 'in_categories()', f'validate {test}, categories[{idx}] out of range')
-            return None
-
-        return valid_categ[idx]
-
-    except (TypeError, ValueError):
-        if test in valid_categ:
-            return test
-
-        log('fail', 'in_categories()', f'validate {test} ; {type(test)}')
-        return None
-
-
-def validate(category: str, name: str, price: float, amount: float, date: str, currency: str = None, link: str = None, valid_categ: list = None) -> bool:
-    """
-    Main validation func of all insert(i) parameters
-    return True for successful validation otherwise False
-    """
-    # [FAIL] in validate() - Other validation error - argument of type 'NoneType' is not a container or iterable
-    # [FAIL] in extract() - data validation
-
-    log_fail = lambda msg: log('fail', 'validate()', msg)
-
-    try:
-        if in_categories(category, valid_categ) is None:
-            log_fail(f'Failed category check {category}')
-            return False
-
-        if price <= 0 or amount <= 0:
-            log_fail(f'Failed price or amount price={price} ; amount={amount}')
-            return False
-
-        if len(name) > 100 or len(date) != 11:
-            log_fail(f'Failed name or date name={name} ; date={date}')
-            return False
-
-        skip_extra_checks = currency is None or link is None or valid_categ is None
-
-        if not skip_extra_checks:
-            if currency not in currencies:
-                log_fail(f'Failed currency={currency} not in {currencies}')
-                return False
-
-            is_link = link.startswith(('https://', 'http://'))
-
-            # allow empty str, or if it starts as http URL
-            if is_link or link != '':
-                log_fail(f'Failed link={link} is not https or http')
-                return False
-
-    except Exception as e:
-        log_fail(f'Other validation error - {e}')
-        return False
-
-    log('ok', 'validate()', f'{category} ; {name}')
-    return True
-
-
 def insert_expense(i: list) -> bool:
     """ add entry to DB table with last validation step """
 
@@ -157,7 +89,7 @@ def insert_income(category, description, converted_amount, link, amount, currenc
     data = (category, description, converted_amount, link, amount, currency, date)
     conn, cursor = sql()
 
-    validate(
+    valid = validate(
         category=category,
         price=converted_amount,
         amount=amount,
@@ -167,6 +99,12 @@ def insert_income(category, description, converted_amount, link, amount, currenc
         valid_categ=categories_income,
         name=description  # 100 char limit
     )
+
+    if not valid:
+        log('fail', 'insert_income()', 'Not inserting in DB, validation failed')
+        return False
+
+    date = f"{'.'.join(date.split('-')[::-1])}."  # convert date to dd.mm.yyyy. format
 
     try:
         cursor.execute(query, data)

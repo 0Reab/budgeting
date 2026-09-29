@@ -4,6 +4,7 @@ from flask import render_template, request, flash, redirect, jsonify, url_for
 from utils.sql_utils import show_db, insert_expense, categories_expenses, categories_income, show_sum_of, db_delete, insert_income
 from utils.backend_utils import read_key, allowed_file, run_backend
 from utils.logger import log
+from utils.validation import has_dupes
 from flask import Flask
 
 
@@ -14,19 +15,28 @@ app = Flask(__name__, template_folder='pages')
 app.config['UPLOAD_FOLDER'] = os.path.join(app.root_path, 'images')
 
 
+def basic(code=200, msg=None, err='Something went wrong.'):
+    ''' Wrapper for ease of use '''
+    # 399, range() is not inclusive
+    if code in range(400):
+        return render_template('home.html', msg=msg), code
+    else:
+        return render_template('home.html', err=f'Error: {code} {err}'), code
+
+
 @app.errorhandler(405)
 def method_not_allowed():
-    return render_template('home.html', err='Error 405: Method not allowed.'), 405
+    return basic(405)
 
 
 @app.errorhandler(404)
 def not_found(error):
-    return render_template('home.html', err='Error 404: Not found.'), 404
+    return basic(404)
 
 
 @app.route('/', methods=['GET'])
 def home():
-    return render_template('home.html')
+    return basic()
 
 
 @app.route('/health', methods=['GET'])
@@ -47,7 +57,7 @@ def stats():
         if categ not in categories_expenses:
             return jsonify({'error': f'parameter category {categ} not available.'}), 400
 
-    if not (0 < count < 9999):
+    if count not in range(9999):
         return jsonify({'error': 'parameter count out of accepted range.'}), 400
 
     return jsonify(show_sum_of(
@@ -60,8 +70,6 @@ def stats():
 @app.route('/add-income', methods=['GET'])
 def income_template():
     ''' Show form for adding income '''
-    # broken atm need to figure out the form submit flow and not have it change href to /api
-    # but stay rather and refresh template
     referer = request.headers.get("Referer")
 
     msg = 'Succes! Add more income.' if referer == '/api/insert/income' else 'Add income.'
@@ -98,12 +106,7 @@ def income():
     )
 
     msg = 'Successful submit.' if ok else ''
-    # msg = f'{'ok' if ok else 'error'}'
-    # return jsonify(
-    #     {'status': msg}
-    # )
 
-    # return render_template('home.html', msg=msg)
     return redirect(url_for('show_table_data', table='income', status=msg))
 
 
@@ -113,10 +116,10 @@ def delete_entry():
 
     id_list = request.args.getlist("id")
 
-    if len(id_list) != len(set(id_list)):
+    if has_dupes(id_list):
         return jsonify({'error': "There are duplicate IDs in your query."}), 400
 
-    if len(id_list) > 50 or len(id_list) <= 0:
+    if id_list in range(50 + 1):
         return jsonify({'error': "Amount of IDs to delete must be x > 0 and x < 50"}), 400
 
     # add tons of validation of user input from id_list later
@@ -215,7 +218,7 @@ def upload():
                 section_header_msg='Choose a category from the dropdown menu.'
             )
         else:
-            return render_template('home.html', err="No URL found in QR code.")
+            return basic(400, err="No URL found in QR code")
 
 
 if __name__ == '__main__':
