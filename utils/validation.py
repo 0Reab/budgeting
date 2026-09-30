@@ -17,7 +17,7 @@ def has_dupes(data: list) -> bool:
     return len(data) != len(set(data))
 
 
-def in_categories(test, valid_categ: list) -> str | False:
+def in_categories(test, valid_categ: list):
     """ Validation - if arg is in whitelist of array categories """
     # potentialy introduced a bug with swappign to False instead of None on fail, check later
     if valid_categ not in categories_all:
