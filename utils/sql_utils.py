@@ -33,7 +33,7 @@ table_income = """
 def sql() -> tuple:
     """ create cursor and SQL DB connection """
 
-    conn = sqlite3.connect("budget.db", check_same_thread=False)
+    conn = sqlite3.connect("data/budget.db", check_same_thread=False)
     return conn, conn.cursor()
 
 

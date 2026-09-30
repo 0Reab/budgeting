@@ -10,7 +10,7 @@ ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg'}
 
 def read_key():
     """ read flask key from file """
-    with open('key.txt', 'r') as f:
+    with open('data/key.txt', 'r') as f:
         key = f.read()
     return key
 

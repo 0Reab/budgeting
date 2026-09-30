@@ -230,16 +230,18 @@ def upload():
 if __name__ == '__main__':
     debug = True
     host = '0.0.0.0'
+    cert = ['data/cert.pem', 'data/key.pem']
+
     app.secret_key = read_key()
     port = int(os.environ.get('PORT', '1337'))
 
     try:
         log('info', 'using self signed cert, SSL/TLS is available.')
 
-        app.run(ssl_context=('cert.pem', 'key.pem'), host=host, port=port, debug=debug)
+        app.run(ssl_context=(cert[0], cert[1]), host=host, port=port, debug=debug)
 
     except FileNotFoundError:
         log('info', 'did not find self signed cert, SSL/TLS not available.')
 
-        app.run(host='0.0.0.0', port=port, debug=True)
+        app.run(host=host, port=port, debug=debug)
 
