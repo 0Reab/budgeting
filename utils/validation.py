@@ -6,7 +6,7 @@ from utils.logger import log
 
 currencies = ['USD', 'GBP', 'RSD']  # USD, British pound, RSD
 
-categories_expenses = ['other', 'tool', 'food', 'transport', 'bill', 'cosmetic', 'nightout', 'hobby']
+categories_expenses = ['other', 'tool', 'food', 'transport', 'bill', 'cosmetic', 'nightout', 'hobby', 'health', 'gift']
 categories_income = ['bug bounty', 'photoshop', 'modoolar']
 
 categories_all = [categories_expenses, categories_income]

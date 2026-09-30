@@ -14,7 +14,8 @@ table_expenses = """
         name TEXT,
         price REAL,
         amount REAL,
-        date TEXT
+        date TEXT,
+        FOREIGN KEY (user_id) REFERENCES users(id)
     )"""
 
 table_income = """
@@ -26,7 +27,8 @@ table_income = """
         link TEXT,
         amount REAL,
         currency CHAR(3),
-        date TEXT
+        date TEXT,
+        FOREIGN KEY (user_id) REFERENCES users(id)
     )"""
 
 
@@ -71,8 +73,11 @@ def execute(cursor, query, conn=None, data=None):
         else:
             cursor.execute(query)
 
-    if conn:
-        conn.commit()
+    finally:
+        if conn:
+            conn.commit()
+
+        conn.close()
 
 
 def insert_expense(i: list) -> bool:
@@ -123,43 +128,37 @@ def insert_income(category, description, converted_amount, link, amount, currenc
     return True
 
 
+def id_in_table(id: str) -> bool:
+    ''' check if id is in table '''
+    conn, cursor = sql()
+
+    rows = cursor.fetchall()
+    conn.close()
+    id_nums = [row[0] for row in rows]
+
+    if int(id) not in id_nums:
+        log('fail', f'not found id={id} in DB')
+        return False
+
+    return True
+
+
 def db_delete(id: str) -> bool:
     """ delete DB table entry by ID or wildcard """
-    # needs refactoring from CLI to Web app operations
-    # could refactor into two functions, validation and delete.
-
     conn, cursor = sql()
-    # user_input = input('Select ID number to delete an entry: ')
+    query = 'DELETE FROM expenses WHERE id = (?)'
 
-    if id == '*':
-        cursor.execute("DELETE FROM expenses")
-        log('ok', 'database wipe')
-        return True
-    else:
-        try:
-            cursor.execute("SELECT id FROM expenses")
-            rows = cursor.fetchall()
+    if not id_in_table(id):
+        return False
 
-            id_nums = [row[0] for row in rows]
-
-            if int(id) not in id_nums:
-                log('fail', f'not found id={id} in DB')
-                return False
-
-            cursor.execute("DELETE FROM expenses WHERE id = (?)", [id])
-
-        except (sqlite3.ProgrammingError, ValueError, TypeError) as e:
-            log('fail', f'query error with id={id} - {e}')
-            return False
-
-    conn.commit()
+    execute(cursor, query, conn, [id])
     log('ok', f'deleted entry ID {id}')
 
     return True
 
 
 def show_db(table: str) -> list:
-    """ formatted print of all table entries to stdout """
+    """ formatted string of all table entries """
 
     if table not in ['expenses', 'income']:
         log('fail', f'{table} is not a valid table.')
@@ -167,11 +166,11 @@ def show_db(table: str) -> list:
 
     query = f'SELECT * FROM {table}'
 
-    _conn, cursor = sql()
-
-    execute(cursor, query)
+    conn, cursor = sql()
+    cursor.execute(query)
 
     db = cursor.fetchall()
+    conn.close()
     result = []
 
     log('ok', 'print db')
@@ -214,22 +213,3 @@ def show_sum_of(time_type: str, categories: list, count: int):
     query = 'SELECT FROM expenses WHERE date = (?)'
     _conn, cursor = sql()
     execute(cursor, query)
-
-
-def show_categories() -> None:
-    """ print global categories to stdout """
-
-    log('ok', 'DB categories')
-
-    for idx, cat in enumerate(categories_income):
-        print(f'{cat} - {idx}')
-
-
-def con_close():
-    """ SQL connection closing """
-    # need to learn when and if this is needed
-
-    conn, _cursor = sql()
-    conn.close()
-
-    log('info', 'closing connection')
