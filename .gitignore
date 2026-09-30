@@ -1,6 +1,9 @@
 budget.db
+user.db
 budget.db-journal
+user.db-journal
 key.txt
+data/
 receipt1.jpg
 .vscode/settings.json
 __pycache__/

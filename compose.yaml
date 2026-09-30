@@ -2,5 +2,7 @@ services:
   web:
     image: budgeting:latest
     build: .
+    volumes:
+      - "./data:/home/budgetapp/data"
     ports:
       - "1337:1337"
