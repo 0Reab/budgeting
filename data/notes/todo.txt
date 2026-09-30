@@ -1,27 +1,19 @@
 # features to implement - ordered
 
-- complete duplicate entry check and reject insertion.
 - uploaded image duplicate detection and rejection - checksum?
 - tests for all functions - gotta do em
 - later in project - raise test exceptions after all tests run rather than immediate stop
 - Move categories into a json configuration - hardcoded currently
 - Data display and visualization - charts and plots
 
-# make documentation
-- proper readme
-- requirements.txt
-
 # security
 - proper pentest after all is completed - sqli, rce, lfi, xss...
 - change to WSGI server
 - track processed images buy checksum value in a list, and don't keep images stored after processing
+- if image processing fails move image to smth like failed folder and ask user for reprocessing or similar.
 - cookie based session - one time login - good practices
 - possible xss vector - receipt item name = payload, victim views tracked items = execution
-- possible ssrf - malicious qr code URL - makes the server visit any URL !
 - check path traversal regex in image path validation
 
-
 # known bugs
-
-# run 
-python -m server.app
+- edit button dissapears on toggle when it should't not critical atm
