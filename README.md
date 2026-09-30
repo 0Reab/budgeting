@@ -27,8 +27,8 @@ Includes features like adding your income, graphs, tables, balance tracking and 
 
 ### Run with Docker
 
-* Build image ```docker build -t budgeting:latest .```.
-* Run the server ```docker run -p 1337:1337 budgeting:latest```.
+* Build and run image ```docker compose up --build```.
+* Live on ```http(s)://localhost:1337``` ((s) if you created the cert).
 
 ### Or run with venv 
 

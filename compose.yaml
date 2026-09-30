@@ -1,0 +1,6 @@
+services:
+  web:
+    image: budgeting:latest
+    build: .
+    ports:
+      - "1337:1337"
