@@ -20,6 +20,10 @@ Includes features like adding your income, graphs, tables, balance tracking and 
 
 * Clone the repository ```git clone <url>``` (main branch).
 * Navigate to project ```cd budgeting-main```.
+* Create Flask key ```echo "<your_long-key>" > key.txt && chmod 400 key.txt```
+
+* Create cert (optional) ```openssl req -x509 -newkey rsa:4096 -keyout key.pem -out cert.pem -days 365 -nodes```.
+* Set cert permissions (optional) ```chmod 644 cert.pem && chmod 400 key.pem```.
 
 ### Run with Docker
 
