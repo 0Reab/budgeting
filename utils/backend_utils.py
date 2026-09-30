@@ -10,9 +10,17 @@ ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg'}
 
 def read_key():
     """ read flask key from file """
-    with open('data/key.txt', 'r') as f:
-        key = f.read()
-    return key
+    try:
+        with open('data/key.txt', 'r') as f:
+            key = f.read()
+            log('ok', 'found valid app key.')
+        return key
+
+    except Exception as e:
+        msg = 'did not find app key'
+        log('fail', f'{msg} - {e}')
+        raise msg
+
 
 
 def allowed_file(filename):
