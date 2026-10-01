@@ -7,6 +7,13 @@ from utils.validation import categories_expenses, categories_income, currencies
 """ Module for: SQL queries, utilities, , formmated prints, DB connection object """
 
 
+table_users = """
+    CREATE TABLE IF NOT EXISTS users (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        user TEXT,
+        password_hash TEXT UNIQUE
+    )"""
+
 table_expenses = """
     CREATE TABLE IF NOT EXISTS expenses (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -45,64 +52,79 @@ def sql_error_handler(error) -> None:
 
     if 'no such table: expenses' in str(error):
         cursor.execute(table_expenses)
-        conn.commit()
         log('info', 'had to create default expenses table')
 
     elif 'no such table: income' in str(error):
         cursor.execute(table_income)
-        conn.commit()
         log('info', 'had to create default income table')
-
     else:
         log('fail', 'unhandled sql error')
         raise Exception('database blew up.')
 
+    conn.commit()
+    conn.close()
 
-def execute(cursor, query, conn=None, data=None):
+
+def execute(query, data=None):
+    ''' run sql query '''
+    conn, cursor = sql()
+    exec = lambda: cursor.execute(query, data) if data else cursor.execute(query)
+
     try:
-        if data:
-            cursor.execute(query, data)
-        else:
-            cursor.execute(query)
-
+        exec()
     except sqlite3.OperationalError as e:
         sql_error_handler(error=e)
 
-        if data:
-            cursor.execute(query, data)
-        else:
-            cursor.execute(query)
+        exec()
 
     finally:
         if conn:
             conn.commit()
+            conn.close()
 
-        conn.close()
+
+def register(user: str, password_hash: str) -> bool:
+    data = (user, password_hash)
+    query = 'INSERT into users (user, password_hash) VALUES (?, ?)'
+
+    # do validation here
+    # return False
+
+    execute(query, data)
+    return True
 
 
-def insert_expense(i: list) -> bool:
+def login(user: str, password_hash: str) -> bool:
+    data = (user, password_hash)
+    query = 'SELECT 1 FROM users WHERE user = (?) AND password_hash = (?)'
+
+    # do validation here
+    # return False
+
+    execute(query, data)
+    return True
+
+
+def insert_expense(item: list, user_id: str) -> bool:
     """ add entry to DB table with last validation step """
+    data = [category, name, price, amount, date] = item
+    data.append(user_id)
 
-    conn, cursor = sql()
-    category, name, price, amount, date = i
-
-    query = 'INSERT INTO expenses (category, name, price, amount, date) VALUES (?, ?, ?, ?, ?)'
-    data = (category, name, price, amount, date)
+    query = 'INSERT INTO expenses (category, name, price, amount, date, user_id) VALUES (?, ?, ?, ?, ?, ?)'
 
     if validate_insert_params(category, name, price, amount, date, valid_categ=categories_expenses) is not True:
         log('fail', 'insert query validation')
         return False
 
-    execute(cursor, query, conn, data)
+    execute(query, data)
 
     log('info', f'{name}')
     return True
 
 
-def insert_income(category, description, converted_amount, link, amount, currency, date):
+def insert_income(category, description, converted_amount, link, amount, currency, date, user_id):
     #                            bug bounty  XSS         50,000           http  500      USD     2026...
-    query = 'INSERT INTO income (category, description, converted_amount, link, amount, currency, date) VALUES (?, ?, ?, ?, ?, ?, ?)'
-    conn, cursor = sql()
+    query = 'INSERT INTO income (category, description, converted_amount, link, amount, currency, date, user_id) VALUES (?, ?, ?, ?, ?, ?, ?, ?)'
 
     valid = validate_insert_params(
         category=category,
@@ -120,9 +142,9 @@ def insert_income(category, description, converted_amount, link, amount, currenc
         return False
 
     date = f"{'.'.join(date.split('-')[::-1])}."  # convert date to dd.mm.yyyy. format
-    data = (category, description, converted_amount, link, amount, currency, date)
+    data = (category, description, converted_amount, link, amount, currency, date, user_id)
 
-    execute(cursor, query, conn, data)
+    execute(query, data)
 
     log('info', f'insert {category} of {amount} {currency}')
     return True
@@ -131,7 +153,6 @@ def insert_income(category, description, converted_amount, link, amount, currenc
 def id_in_table(id: str) -> bool:
     ''' check if id is in table '''
     conn, cursor = sql()
-
     rows = cursor.fetchall()
     conn.close()
     id_nums = [row[0] for row in rows]
@@ -143,28 +164,28 @@ def id_in_table(id: str) -> bool:
     return True
 
 
-def db_delete(id: str) -> bool:
+def db_delete(item_id: str, user_id: str) -> bool:
     """ delete DB table entry by ID or wildcard """
-    conn, cursor = sql()
     query = 'DELETE FROM expenses WHERE id = (?)'
 
-    if not id_in_table(id):
+    if not id_in_table(item_id):
         return False
 
-    execute(cursor, query, conn, [id])
-    log('ok', f'deleted entry ID {id}')
+    execute(query, [item_id])
+    log('ok', f'deleted entry ID {item_id}')
 
     return True
 
 
-def show_db(table: str) -> list:
+def show_db(table: str, user_id: str) -> list:
     """ formatted string of all table entries """
 
     if table not in ['expenses', 'income']:
         log('fail', f'{table} is not a valid table.')
         return []
 
-    query = f'SELECT * FROM {table}'
+    # should be safe since table and user_id are not user input
+    query = f'SELECT * FROM {table} WHERE user_id = {user_id}'
 
     conn, cursor = sql()
     cursor.execute(query)
@@ -211,5 +232,4 @@ def show_sum_of(time_type: str, categories: list, count: int):
     # but i also gotta sum each month - should be easy, *.9.2025 so anything that satisfies this i gues, take total values and sum
 
     query = 'SELECT FROM expenses WHERE date = (?)'
-    _conn, cursor = sql()
-    execute(cursor, query)
+    execute(query)
