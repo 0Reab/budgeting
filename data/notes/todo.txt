@@ -15,6 +15,9 @@
 
 # features for the future
 
+- export
+- balance from different sources
+- add EUR/CAD to currency.
 - global available budget tracking aka how much moni u got.
 - include categories for budget sources (bank or online wallet like paypal)
   this likely means ill have to expand each table with balance_location, oh god and different currencies.

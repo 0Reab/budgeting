@@ -76,12 +76,11 @@ def execute(query, data=None) -> list:
     # im not sure on best return type beacuse this does read/write/delete
     # successful fetch returns a list from data, write/delete returns what? [] or None? or object
     conn, cursor = sql()
-    result = None
 
     def exec():
         if data:
             result = cursor.execute(query, data)
-            db = cursor.fetchall()
+            db = cursor.fetchall()  # <- bug here, not returning, should i? no clue, maybe just forgot to delete this line
             log('info', f'SQL -> {(query, data, db)}')
         else:
             result = cursor.execute(query)
@@ -90,15 +89,15 @@ def execute(query, data=None) -> list:
         if result == [] or result == () or result == {}:
             result = None
 
-    try:
-        result = exec()
         return result
+
+    try:
+        return exec()
 
     except sqlite3.OperationalError as e:
         sql_error_handler(error=e)
 
-        result = exec()
-        return result
+        return exec()
 
     finally:
         if conn:

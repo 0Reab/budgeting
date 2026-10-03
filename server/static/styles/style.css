@@ -493,6 +493,10 @@ Slightly tighter table on phones.
     animation: scaleIn .3s ease;
 }
 
+.scale-in-slow {
+    animation: scaleIn .5s ease;
+}
+
 .fade-in {
     animation: fadeIn .3s ease;
 }
@@ -507,6 +511,10 @@ Slightly tighter table on phones.
 
 .appear-from-below {
     animation: appearFromBelow .5s ease-out;
+}
+
+.appear-from-right {
+    animation: appearFromRight .5s ease-out;
 }
 
 .glow-up {
@@ -549,6 +557,16 @@ Slightly tighter table on phones.
     to {
         opacity: 1;
         transform: translateY(0);
+    }
+}
+@keyframes appearFromRight {
+    from {
+        opacity: 0;
+        transform: translateX(+100px);
+    }
+    to {
+        opacity: 1;
+        transform: translateX(0);
     }
 }
 @keyframes scaleIn {

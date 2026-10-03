@@ -19,7 +19,7 @@ app.config['UPLOAD_FOLDER'] = os.path.join(app.root_path, 'images')
 bcrypt = Bcrypt(app)
 
 
-def basic(code=200, msg=None, err='Something went wrong.'):
+def basic(code=200, msg=None, err='Route not found.'):
     ''' Wrapper for ease of use '''
     # 399, range() is not inclusive
     if code in range(400):
@@ -32,10 +32,11 @@ def basic(code=200, msg=None, err='Something went wrong.'):
 def check_session():
     path_no_auth = request.path.startswith(('/login', '/register', '/static'))
     no_session = session.get('id') is None
+    path = request.path
 
     if no_session and not path_no_auth:
         session.clear()
-        return redirect(url_for('login_route'))
+        return render_template('login.html', err=f'You need to be logged in to access {path}.')
 
 
 @app.errorhandler(405)
@@ -45,7 +46,7 @@ def method_not_allowed(*args, **kwargs):
 
 @app.errorhandler(404)
 def not_found(error):
-    return basic(404)
+    return basic(404, err=f'route {request.path} not found.')
 
 
 @app.route('/', methods=['GET'])
@@ -80,12 +81,19 @@ def login_route():
     if request.method == 'POST':
         user = request.form['username']
         password = request.form['password']
-        password_hash_in_db = get_user_row('user', user, 'password_hash').encode('utf8')
+
+        hash_in_db = get_user_row('user', user, 'password_hash')
+
+        if hash_in_db is None:
+            log('info', 'Wrong password')
+            return render_template('login.html', err='Incorrect password.')
+
+        hash_in_db = hash_in_db.encode('utf8')
 
         try:
-            if bcrypt.check_password_hash(password_hash_in_db, password):
+            if bcrypt.check_password_hash(hash_in_db, password):
                 session.clear()
-                login(user, password_hash_in_db)
+                login(user, hash_in_db)
                 id = get_user_row('user', user, retrieve='id')
                 session['name'] = user
                 session['id'] = id
@@ -107,7 +115,7 @@ def register_route():
 
         register(user, password_hash)
 
-        return redirect(url_for('login_route'))
+        return render_template('login.html', msg=f'User {user} registered.')
 
     return render_template('register.html')
 
@@ -212,7 +220,7 @@ def delete_entry():
         return {'status': 'error', 'error': f'Failed to delete id: {user_id} ; Invalid user session'}
 
     for item_id in id_list:
-        if db_delete(item_id, user_id, 'expenses') is False:
+        if db_delete(item_id, user_id, table) is False:
             errors.append(f'Failed to delete id: {user_id}')
 
     msg = 'error' if errors else 'ok'

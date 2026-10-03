@@ -13,10 +13,10 @@
 <body>
     <div class="container">
         <section class="card">
-        <h1 class="mc" style="margin-bottom: 20px">Register to Budgeting™</h1>
+        <h1 class="mc fade-in-slow" style="margin-bottom: 20px">Register to Budgeting™</h1>
 
         <form action="/register" method="POST" class="income-form">
-            <div class="container">
+            <div class="container appear-from-right">
                 <label for="username"><b>Username</b></label>
                 <input type="text" placeholder="Enter Username" name="username" style="display: block" required>
 
@@ -26,15 +26,25 @@
                 <button type="submit" style="margin-top: 10px; margin-left: 5px" class="blue-button">Register</button>
             </div>
 
-            <div class="container">
+            <div class="container fade-in">
                 <button type="button" class="cancelbtn blue-button" style="margin-top: 10px; margin-left: 5px" onclick="document.location = '/';">Cancel</button>
                 <span class="psw">Forgot <a href="#">password?</a></span>
             </div>
         </form>
 
-        <a style="margin: 10px;" href="{{ url_for('login_route') }}">Already have an account? Log In</a>
+        <a class="fade-in-slow" style="margin: 10px;" href="{{ url_for('login_route') }}">Already have an account? Log In</a>
 
-        <header class="page-header">
+        {% if msg %}
+        <div class="message fade-in scale-in-slow notifiy" style="margin-top: 10px">
+            {{ msg }}
+        </div>
+        {% endif %}
+
+        {% if err %}
+        <div class="error fade-in scale-in-slow notify" style="margin-top: 10px;">
+            {{ err }}
+        </div>
+        {% endif %}
         </section>
     </div>
 </body>
