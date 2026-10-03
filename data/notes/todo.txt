@@ -1,14 +1,29 @@
 # features to implement - ordered
 
-- uploaded image duplicate detection and rejection - checksum?
+- add delete user_id authorization check and then its checkpoint 2 push :)
+- user remember me from login form to clear cookie on page close.
+- remove all instances of variables called as id beacause thats a built in function lel
+- add logout clear cookies
+- basic authentication with flask session, (later add acc recovery method with static keys for prod)
+- add button to add expense manually and annotate them.
+- Data display and visualization - charts and plots
 - tests for all functions - gotta do em
 - later in project - raise test exceptions after all tests run rather than immediate stop
-- Move categories into a json configuration - hardcoded currently
-- Data display and visualization - charts and plots
+- Move categories into a json configuration or classes better - hardcoded currently
+- uploaded image duplicate detection and rejection - checksum? (only for production, testing env no)
+
+
+# features for the future
+
+- global available budget tracking aka how much moni u got.
+- include categories for budget sources (bank or online wallet like paypal)
+  this likely means ill have to expand each table with balance_location, oh god and different currencies.
+
 
 # security
+
 - proper pentest after all is completed - sqli, rce, lfi, xss...
-- change to WSGI server
+- change proper to WSGI server
 - track processed images buy checksum value in a list, and don't keep images stored after processing
 - if image processing fails move image to smth like failed folder and ask user for reprocessing or similar.
 - cookie based session - one time login - good practices

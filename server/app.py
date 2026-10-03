@@ -1,11 +1,14 @@
 import os
+
+from flask_bcrypt import Bcrypt
+
+from flask import Flask, session
 from flask import render_template, request, flash, redirect, jsonify, url_for
 
-from utils.sql_utils import show_db, insert_expense, categories_expenses, categories_income, show_sum_of, db_delete, insert_income
+from utils.sql_utils import show_db, insert_expense, categories_expenses, categories_income, show_sum_of, db_delete, insert_income, user_exists, get_user_row, register, login
 from utils.backend_utils import read_key, allowed_file, process_image
 from utils.logger import log
-from utils.validation import has_dupes
-from flask import Flask
+from utils.validation import has_dupes, valid_user_id
 
 
 # mr global variable -> refactor later
@@ -13,6 +16,7 @@ items = []
 
 app = Flask(__name__, template_folder='pages')
 app.config['UPLOAD_FOLDER'] = os.path.join(app.root_path, 'images')
+bcrypt = Bcrypt(app)
 
 
 def basic(code=200, msg=None, err='Something went wrong.'):
@@ -22,6 +26,16 @@ def basic(code=200, msg=None, err='Something went wrong.'):
         return render_template('home.html', msg=msg), code
     else:
         return render_template('home.html', err=f'Error: {code} {err}'), code
+
+
+@app.before_request
+def check_session():
+    path_no_auth = request.path.startswith(('/login', '/register', '/static'))
+    no_session = session.get('id') is None
+
+    if no_session and not path_no_auth:
+        session.clear()
+        return redirect(url_for('login_route'))
 
 
 @app.errorhandler(405)
@@ -36,7 +50,8 @@ def not_found(error):
 
 @app.route('/', methods=['GET'])
 def home():
-    return basic()
+    msg = f'Welcome {session.get('name')}!'
+    return basic(msg=msg)
 
 
 @app.route('/health', methods=['GET'])
@@ -44,6 +59,57 @@ def health():
     # add more checks, then return 200 OK
     # maybe file integrity, DB test...
     return 'STATUS=OK', 200
+
+
+@app.route('/debug', methods=['GET'])
+def debug_route():
+    user = session.get('name')
+    id = session.get('id')
+
+    return f'user={user} ; id={id}', 200
+
+
+@app.route('/logout', methods=['GET'])
+def logut_route():
+    session.clear()
+    return redirect(url_for('login_route'))
+
+
+@app.route('/login', methods=['GET', 'POST'])
+def login_route():
+    if request.method == 'POST':
+        user = request.form['username']
+        password = request.form['password']
+        password_hash_in_db = get_user_row('user', user, 'password_hash').encode('utf8')
+
+        try:
+            if bcrypt.check_password_hash(password_hash_in_db, password):
+                session.clear()
+                login(user, password_hash_in_db)
+                id = get_user_row('user', user, retrieve='id')
+                session['name'] = user
+                session['id'] = id
+
+                return redirect(url_for('home'))
+
+        except ValueError as e:
+            log('fail', f'bad user input {e}')
+
+    return render_template('login.html')
+
+
+@app.route('/register', methods=['GET', 'POST'])
+def register_route():
+    if request.method == 'POST':
+        user = request.form['username']
+        password = request.form['password']
+        password_hash = bcrypt.generate_password_hash(password).decode('utf8')
+
+        register(user, password_hash)
+
+        return redirect(url_for('login_route'))
+
+    return render_template('register.html')
 
 
 @app.route('/api/stats/month', methods=['GET'])
@@ -94,6 +160,7 @@ def income():
     amount = request.form['amount']
     link = request.form['link']
     date = request.form['date']
+    user_id = session.get('id')
 
     ok = insert_income(
         category,
@@ -102,7 +169,8 @@ def income():
         link,
         amount,
         currency,
-        date
+        date,
+        user_id
     )
 
     msg = 'Successful submit.' if ok else ''
@@ -126,8 +194,13 @@ def delete_entry():
 
     errors = []
 
-    for id in id_list:
-        if db_delete(id) is False:
+    user_id = session.get('id')
+
+    if not valid_user_id(user_id):
+        return jsonify({'status': 'error', 'error': f'Failed to delete id: {id} ; Invalid user session'})
+
+    for item_id in id_list:
+        if db_delete(item_id, user_id) is False:
             errors.append(f'Failed to delete id: {id}')
 
     msg = 'error' if errors else 'ok'
@@ -145,9 +218,14 @@ def show_table_data(table):
         return render_template('home.html', err_msg=f"Table {table} doesn't exist")
 
     status = request.args.get('status')
+    user_id = session.get('id')
 
     msg = 'Success :)' if status else f'Showing {table}'
-    entries = show_db(table)
+
+    if not valid_user_id(user_id):
+        return basic(400)
+
+    entries = show_db(table, user_id=user_id)
 
     return render_template(
         'home.html',
@@ -182,11 +260,16 @@ def categories_post():
             categories=categories_expenses
         ), 400
 
+    user_id = session.get('id')
+
+    if not valid_user_id(user_id):
+        return basic(400, err='Authorization error.')
+
     for item in items:
         # update category with user input and insert in db
         item[0] = user_categs[0]
         user_categs.pop(0)
-        insert_expense(item)
+        insert_expense(item, user_id)
 
     items = []  # clear global buffer
 

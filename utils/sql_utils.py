@@ -22,6 +22,7 @@ table_expenses = """
         price REAL,
         amount REAL,
         date TEXT,
+        user_id INTEGER,
         FOREIGN KEY (user_id) REFERENCES users(id)
     )"""
 
@@ -35,6 +36,7 @@ table_income = """
         amount REAL,
         currency CHAR(3),
         date TEXT,
+        user_id INTEGER,
         FOREIGN KEY (user_id) REFERENCES users(id)
     )"""
 
@@ -57,9 +59,13 @@ def sql_error_handler(error) -> None:
     elif 'no such table: income' in str(error):
         cursor.execute(table_income)
         log('info', 'had to create default income table')
+
+    elif 'no such table: users' in str(error):
+        cursor.execute(table_users)
+        log('info', 'had to create default users table')
     else:
         log('fail', 'unhandled sql error')
-        raise Exception('database blew up.')
+        raise Exception(f'database blew up. good luck -> {error}')
 
     conn.commit()
     conn.close()
@@ -88,9 +94,14 @@ def register(user: str, password_hash: str) -> bool:
     query = 'INSERT into users (user, password_hash) VALUES (?, ?)'
 
     # do validation here
+    if user_exists(user):
+        log('fail', f'user {user} already exists')
+        return False
+
     # return False
 
     execute(query, data)
+    log('info', f'registered user {user}')
     return True
 
 
@@ -102,7 +113,53 @@ def login(user: str, password_hash: str) -> bool:
     # return False
 
     execute(query, data)
+    log('info', f'logged in user {user}')
     return True
+
+
+def user_exists(user: str) -> bool:
+    query = "SELECT 1 FROM users WHERE user = ? LIMIT 1"
+
+    conn, cursor = sql()
+
+    try:
+        cursor.execute(query, (user,))
+        return cursor.fetchone() is not None
+    except Exception as e:
+        log('fail', e)
+        sql_error_handler(e)
+        cursor.execute(query, (user,))
+        return cursor.fetchone() is not None
+    finally:
+        conn.close()
+
+
+def get_user_row(query_type, query_value, retrieve='all'):
+    ''' fetch user data via args like query (id/user/hash) and its value, and declare return type in (retreive)'''
+    conn, cursor = sql()
+    allow = ['id', 'user', 'password_hash']
+
+    type_fail = query_type not in allow
+    allow.append('all')
+    retrive_fail = retrieve not in allow
+
+    if type_fail or retrive_fail:
+        log('fail', 'usage of this func')
+
+    cursor.execute(f"SELECT id, user, password_hash FROM users WHERE {query_type} = ?", (query_value,))
+
+    try:
+        row = cursor.fetchone()
+        if row is None:
+            return None
+
+        match retrieve:
+            case 'all': return row
+            case 'id': return row[0]
+            case 'user': return row[1]
+            case 'password_hash': return row[2]
+    finally:
+        conn.close()
 
 
 def insert_expense(item: list, user_id: str) -> bool:
@@ -112,7 +169,7 @@ def insert_expense(item: list, user_id: str) -> bool:
 
     query = 'INSERT INTO expenses (category, name, price, amount, date, user_id) VALUES (?, ?, ?, ?, ?, ?)'
 
-    if validate_insert_params(category, name, price, amount, date, valid_categ=categories_expenses) is not True:
+    if validate_insert_params(category, name, price, amount, date, valid_categ=categories_expenses, user_id=user_id) is not True:
         log('fail', 'insert query validation')
         return False
 
@@ -134,7 +191,8 @@ def insert_income(category, description, converted_amount, link, amount, currenc
         currency=currency,
         link=link,
         valid_categ=categories_income,
-        name=description  # 100 char limit
+        name=description,  # 100 char limit
+        user_id=user_id
     )
 
     if not valid:
@@ -151,7 +209,7 @@ def insert_income(category, description, converted_amount, link, amount, currenc
 
 
 def id_in_table(id: str) -> bool:
-    ''' check if id is in table '''
+    ''' NOT for user authorization, checks if id is in table '''
     conn, cursor = sql()
     rows = cursor.fetchall()
     conn.close()
@@ -188,23 +246,32 @@ def show_db(table: str, user_id: str) -> list:
     query = f'SELECT * FROM {table} WHERE user_id = {user_id}'
 
     conn, cursor = sql()
-    cursor.execute(query)
+    db = None
+    try:
+        cursor.execute(query)
+        db = cursor.fetchall()
+    except Exception as e:
+        sql_error_handler(e)
+    finally:
+        conn.close()
 
-    db = cursor.fetchall()
-    conn.close()
+    if db is None:
+        log('fail', 'no data fetched')
+        return []
+
     result = []
 
     log('ok', 'print db')
 
     if table == 'expenses':
         for entry in db:
-            id, categ, name, total, qty, date = entry  # should change these to classes yeh?
+            id, categ, name, total, qty, date, user_id = entry  # should change these to classes yeh?
             line = f'ID - {id} | categ - {categ} | name - {name} | total - {total} | qty - {qty} | date - {date}'
             result.append(line)
 
     elif table == 'income':
         for entry in db:
-            id, categ, desc, conver, link, amount, curr, date = entry  # should change these to classes yeh?
+            id, categ, desc, conver, link, amount, curr, date, user_id = entry  # should change these to classes yeh?
             line = f'ID - {id} | categ - {categ} | description - {desc} | converted_amount - {conver} | link - {link} | amount - {amount} | currency - {curr} | date - {date}'
             result.append(line)
 

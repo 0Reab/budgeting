@@ -98,26 +98,31 @@ def valid_link(link: str) -> bool:
     return True
 
 
-def validate_insert_params(category: str, name: str, price: float, amount: float, date: str, currency: str = None, link: str = None, valid_categ: list = None) -> bool:
+def valid_user_id(id):
+    if id is not None:
+        return True
+    else:
+        log('fail', f'id={id}')
+        return False
+
+
+def validate_insert_params(category: str, name: str, price: float, amount: float, date: str, currency: str = None, link: str = None, valid_categ: list = None, user_id: str = None) -> bool:
     """
     Main validation func of all insert(i) parameters
     return True for successful validation otherwise False
     """
 
     try:
-        if not in_categories(category, valid_categ):
-            return False
+        validation_results = [
+            in_categories(category, valid_categ),
+            valid_name(name),
+            valid_price(price),
+            valid_amount(amount),
+            valid_date(date),
+            valid_user_id(id),
+        ]
 
-        if not valid_price(price):
-            return False
-
-        if not valid_amount(amount):
-            return False
-
-        if not valid_name(name):
-            return False
-
-        if not valid_date(date):
+        if False in validation_results:
             return False
 
         skip_extra_checks = currency is None or link is None or valid_categ is None

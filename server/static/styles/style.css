@@ -154,10 +154,6 @@
         border: 1px solid #ddd;
     }
 
-    .saved-button:hover {
-        /*background: #f5f5f5; */
-    }
-
     .send-button {
         width: 100%;
         margin-top: 16px;
