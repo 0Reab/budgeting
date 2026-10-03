@@ -39,7 +39,7 @@ def check_session():
 
 
 @app.errorhandler(405)
-def method_not_allowed():
+def method_not_allowed(*args, **kwargs):
     return basic(405)
 
 
@@ -124,7 +124,7 @@ def stats():
             return jsonify({'error': f'parameter category {categ} not available.'}), 400
 
     if count not in range(9999):
-        return jsonify({'error': 'parameter count out of accepted range.'}), 400
+        return {'error': 'parameter count out of accepted range.'}, 400
 
     return jsonify(show_sum_of(
         time_type='monthly',
@@ -183,12 +183,24 @@ def delete_entry():
     '''Delete database entries with given ID'''
 
     id_list = request.args.getlist("id")
+    table = request.referrer.split('/')[-1]
+
+    if table not in ('expenses', 'income'):
+        err = 'Table not allowed.'
+        log('fail', table)
+        return {'error': table}, 400
+
+    # move off the validation to is module log there and return json here ye?
 
     if has_dupes(id_list):
-        return jsonify({'error': "There are duplicate IDs in your query."}), 400
+        err = 'There are duplicate IDs in your query.'
+        log('fail', err)
+        return {'error': err}, 400
 
     if id_list in range(50 + 1):
-        return jsonify({'error': "Amount of IDs to delete must be x > 0 and x < 50"}), 400
+        err = 'Amount of IDs to delete must be 1-50.'
+        log('fail', err)
+        return {'error': err}, 400
 
     # add tons of validation of user input from id_list later
 
@@ -197,17 +209,15 @@ def delete_entry():
     user_id = session.get('id')
 
     if not valid_user_id(user_id):
-        return jsonify({'status': 'error', 'error': f'Failed to delete id: {id} ; Invalid user session'})
+        return {'status': 'error', 'error': f'Failed to delete id: {user_id} ; Invalid user session'}
 
     for item_id in id_list:
-        if db_delete(item_id, user_id) is False:
-            errors.append(f'Failed to delete id: {id}')
+        if db_delete(item_id, user_id, 'expenses') is False:
+            errors.append(f'Failed to delete id: {user_id}')
 
     msg = 'error' if errors else 'ok'
 
-    return jsonify(
-        {'status': msg, msg: errors}
-    )
+    return {'status': msg, msg: errors}, 200
 
 
 @app.route('/show/<table>', methods=['GET'])

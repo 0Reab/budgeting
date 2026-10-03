@@ -71,17 +71,34 @@ def sql_error_handler(error) -> None:
     conn.close()
 
 
-def execute(query, data=None):
+def execute(query, data=None) -> list:
     ''' run sql query '''
+    # im not sure on best return type beacuse this does read/write/delete
+    # successful fetch returns a list from data, write/delete returns what? [] or None? or object
     conn, cursor = sql()
-    exec = lambda: cursor.execute(query, data) if data else cursor.execute(query)
+    result = None
+
+    def exec():
+        if data:
+            result = cursor.execute(query, data)
+            db = cursor.fetchall()
+            log('info', f'SQL -> {(query, data, db)}')
+        else:
+            result = cursor.execute(query)
+            log('info', f'SQL -> {(query, data)}')
+
+        if result == [] or result == () or result == {}:
+            result = None
 
     try:
-        exec()
+        result = exec()
+        return result
+
     except sqlite3.OperationalError as e:
         sql_error_handler(error=e)
 
-        exec()
+        result = exec()
+        return result
 
     finally:
         if conn:
@@ -208,25 +225,30 @@ def insert_income(category, description, converted_amount, link, amount, currenc
     return True
 
 
-def id_in_table(id: str) -> bool:
-    ''' NOT for user authorization, checks if id is in table '''
-    conn, cursor = sql()
-    rows = cursor.fetchall()
-    conn.close()
-    id_nums = [row[0] for row in rows]
-
-    if int(id) not in id_nums:
-        log('fail', f'not found id={id} in DB')
+def user_owned(user_id: str, item_id: str, table: str) -> bool:
+    ''' check if user owns given item from the table '''
+    if table not in ['expenses', 'income']:
+        log('fail', 'usage: wrong table arg.')
         return False
 
-    return True
+    data = (user_id, item_id)
+    query = f'SELECT 1 FROM {table} WHERE user_id = (?) AND id = (?) LIMIT 1'
+
+    result = execute(query, data)
+
+    if result is None:
+        log('fail', f'User user_id={user_id} is NOT owner of item_id={item_id}, or item does not exist.')
+    else:
+        log('info', f'User user_id={user_id} OWNS item_id={item_id}')
+
+    return result is not None
 
 
-def db_delete(item_id: str, user_id: str) -> bool:
+def db_delete(item_id: str, user_id: str, table: str) -> bool:
     """ delete DB table entry by ID or wildcard """
-    query = 'DELETE FROM expenses WHERE id = (?)'
+    query = f'DELETE FROM {table} WHERE id = (?)'
 
-    if not id_in_table(item_id):
+    if not user_owned(user_id, item_id, table):
         return False
 
     execute(query, [item_id])
