@@ -79,12 +79,12 @@ def execute(query, data=None) -> list:
 
     def exec():
         if data:
-            result = cursor.execute(query, data)
-            db = cursor.fetchall()  # <- bug here, not returning, should i? no clue, maybe just forgot to delete this line
-            log('info', f'SQL -> {(query, data, db)}')
+            cursor.execute(query, data)
+            result = cursor.fetchall()
+            log('info', f'SQL -> {(query, data, result)}')
         else:
             result = cursor.execute(query)
-            log('info', f'SQL -> {(query, data)}')
+            log('info', f'SQL -> {(query, data, result)}')
 
         if result == [] or result == () or result == {}:
             result = None
@@ -114,11 +114,16 @@ def register(user: str, password_hash: str) -> bool:
         log('fail', f'user {user} already exists')
         return False
 
-    # return False
-
     execute(query, data)
     log('info', f'registered user {user}')
     return True
+
+
+def user_exists(user: str) -> bool:
+    query = "SELECT 1 FROM users WHERE user = ? LIMIT 1"
+
+    if execute(query, (user,)) is not None:
+        return True
 
 
 def login(user: str, password_hash: str) -> bool:
@@ -128,32 +133,17 @@ def login(user: str, password_hash: str) -> bool:
     # do validation here
     # return False
 
+    log('info', f'try login user {user}')
     execute(query, data)
     log('info', f'logged in user {user}')
     return True
-
-
-def user_exists(user: str) -> bool:
-    query = "SELECT 1 FROM users WHERE user = ? LIMIT 1"
-
-    conn, cursor = sql()
-
-    try:
-        cursor.execute(query, (user,))
-        return cursor.fetchone() is not None
-    except Exception as e:
-        log('fail', e)
-        sql_error_handler(e)
-        cursor.execute(query, (user,))
-        return cursor.fetchone() is not None
-    finally:
-        conn.close()
 
 
 def get_user_row(query_type, query_value, retrieve='all'):
     ''' fetch user data via args like query (id/user/hash) and its value, and declare return type in (retreive)'''
     conn, cursor = sql()
     allow = ['id', 'user', 'password_hash']
+    log('ok', 'init')
 
     type_fail = query_type not in allow
     allow.append('all')
@@ -166,6 +156,7 @@ def get_user_row(query_type, query_value, retrieve='all'):
 
     try:
         row = cursor.fetchone()
+        log('info', row)
         if row is None:
             return None
 

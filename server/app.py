@@ -82,23 +82,31 @@ def login_route():
         user = request.form['username']
         password = request.form['password']
 
+        log('ok', 'login attempt init')
         hash_in_db = get_user_row('user', user, 'password_hash')
+        log('info', f'hash in db debug {hash_in_db}')
 
         if hash_in_db is None:
-            log('info', 'Wrong password')
-            return render_template('login.html', err='Incorrect password.')
+            log('info', 'User does not exist.')
+            return render_template('login.html', err=f'User {user} does not exist.')
 
         hash_in_db = hash_in_db.encode('utf8')
+        log('info', f'hash in db encoded debug {hash_in_db}')
 
+        log('ok', 'checking password')
         try:
             if bcrypt.check_password_hash(hash_in_db, password):
+                log('info', 'password passed check.')
                 session.clear()
                 login(user, hash_in_db)
-                id = get_user_row('user', user, retrieve='id')
+                user_id = get_user_row('user', user, retrieve='id')
                 session['name'] = user
-                session['id'] = id
+                session['id'] = user_id
 
                 return redirect(url_for('home'))
+            else:
+                log('info', 'Wrong password')
+                return render_template('login.html', err='Incorrect password.')
 
         except ValueError as e:
             log('fail', f'bad user input {e}')
@@ -113,9 +121,10 @@ def register_route():
         password = request.form['password']
         password_hash = bcrypt.generate_password_hash(password).decode('utf8')
 
-        register(user, password_hash)
-
-        return render_template('login.html', msg=f'User {user} registered.')
+        if register(user, password_hash):
+            return render_template('login.html', msg=f'User {user} registered.')
+        else:
+            return render_template('register.html', err=f'User {user} already exists.')
 
     return render_template('register.html')
 
