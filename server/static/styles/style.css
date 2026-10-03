@@ -150,8 +150,8 @@
         /* width: 100%; */
         margin-top: 12px;
         background: #fff;
-        color: #222;
-        border: 1px solid #ddd;
+        /*color: #222; */
+        /*border: 1px solid #ddd;*/
     }
 
     .send-button {
@@ -159,6 +159,7 @@
         margin-top: 16px;
     }
 
+    /*
     .green-button{
         background-image: linear-gradient(to bottom right, lightgreen, yellow);
     }
@@ -167,16 +168,36 @@
         background-image: linear-gradient(to bottom right, #50a7f4, #5bf0ff);
     }
 
-    .red-button{
-        background-image: linear-gradient(to bottom right, #ffa671, #ff6767);
-    }
-
     .yellow-button{
         background-image: linear-gradient(to bottom right, #fdffaf, #ffcb00);
     }
 
+    .red-button{
+        background-image: linear-gradient(to bottom right, #ffa671, #ff6767);
+    }
+    */
+
+    .green-button {
+        background-image: linear-gradient(135deg,#67d5a7, #00ce47);
+    }
+
+    .blue-button {
+        background-image: linear-gradient(135deg, #5b9ee8, #8067d8);
+    }
+
+    .yellow-button {
+        background-image: linear-gradient(to bottom right, #f9ff5b, #ffcb00);
+    }
+    .red-button{
+        background-image: linear-gradient(to bottom right, #ffa671, #ff6767);
+    }
+
     .black-button{
         background-image: linear-gradient(to bottom right, #6c71aa, #2c2737);
+    }
+
+    .purple-button{
+        background-image: linear-gradient(to bottom right, #bd78ac, #6b2171);
     }
 
     /* Messages */

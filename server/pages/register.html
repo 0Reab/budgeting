@@ -13,10 +13,9 @@
 <body>
     <div class="container">
         <section class="card">
+        <h1 class="mc" style="margin-bottom: 20px">Register to Budgeting™</h1>
 
-        <h1>Register Page</h1>
-
-        <form action="/register" method="POST">
+        <form action="/register" method="POST" class="income-form">
             <div class="container">
                 <label for="username"><b>Username</b></label>
                 <input type="text" placeholder="Enter Username" name="username" style="display: block" required>
@@ -24,16 +23,16 @@
                 <label for="password"><b>Password</b></label>
                 <input type="password" placeholder="Enter Password" name="password" style="display: block" required>
 
-                <button type="submit" style="margin-top: 10px">Register</button>
+                <button type="submit" style="margin-top: 10px; margin-left: 5px" class="blue-button">Register</button>
             </div>
 
             <div class="container">
-                <button type="button" class="cancelbtn" style="margin-top: 10px;" onclick="document.location = '/';">Cancel</button>
+                <button type="button" class="cancelbtn blue-button" style="margin-top: 10px; margin-left: 5px" onclick="document.location = '/';">Cancel</button>
                 <span class="psw">Forgot <a href="#">password?</a></span>
             </div>
         </form>
 
-        <a href="{{ url_for('login_route') }}">Already have an account? Log In</a>
+        <a style="margin: 10px;" href="{{ url_for('login_route') }}">Already have an account? Log In</a>
 
         <header class="page-header">
         </section>
