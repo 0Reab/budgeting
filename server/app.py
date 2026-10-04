@@ -5,7 +5,7 @@ from flask_bcrypt import Bcrypt
 from flask import Flask, session
 from flask import render_template, request, flash, redirect, jsonify, url_for
 
-from utils.sql_utils import show_db, insert_expense, categories_expenses, categories_income, show_sum_of, db_delete, insert_income, user_exists, get_user_row, register, login
+from utils.sql_utils import show_db, insert_expense, categories_expenses, categories_income, show_sum_of, db_delete, insert_income, user_exists, get_user_row, register, login, show_budget_sum
 from utils.backend_utils import read_key, allowed_file, process_image
 from utils.logger import log
 from utils.validation import has_dupes, valid_user_id
@@ -30,7 +30,14 @@ def basic(code=200, msg=None, err='Route not found.'):
 
 @app.template_global()
 def show_user_name():
-    return session.get('name')
+    if session:
+        return session.get('name')
+
+
+@app.template_global()
+def show_budget():
+    if session:
+        return show_budget_sum(session.get('id'))
 
 
 @app.before_request

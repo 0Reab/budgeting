@@ -19,7 +19,7 @@
                     <button onclick="document.location.href = '/logout';" style="margin: 10px" class="red-button">Logout</button>
                         <a href="/profile">User: {{ show_user_name() }}</a>
                 </div>
-                <h2 class="balance lighten hover-pop" id="balance" style="text-align: right; width:">$3324.51</h2>
+                    <h2 class="balance lighten hover-pop" id="balance" style="text-align: right; width:">${{ show_budget() }}</h2>
             </div>
             <p class="header-text">Upload a receipt and organise your expenses.</p>
         </header>

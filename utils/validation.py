@@ -4,7 +4,8 @@ from utils.logger import log
 ''' Module only for validation, to be used anywhere (needs more docstrings and robustnes)'''
 
 
-currencies = ['USD', 'GBP', 'RSD']  # USD, British pound, RSD
+currencies = ['USD', 'GBP', 'RSD', 'EUR', 'CAD']  # USD, British pound, RSD
+wallet_types = ['bank', 'paypal']
 
 categories_expenses = ['other', 'tool', 'food', 'transport', 'bill', 'cosmetic', 'nightout', 'hobby', 'health', 'gift']
 categories_income = ['bug bounty', 'photoshop', 'modoolar']
@@ -89,9 +90,9 @@ def valid_currency(currency: str) -> bool:
 def valid_link(link: str) -> bool:
     ''' allow empty str, or if it starts as http URL '''
 
-    is_link = link.startswith(('https://', 'http://'))
+    not_http = not link.startswith(('https://', 'http://'))
 
-    if is_link or link != '':
+    if not_http and link != '':
         log('fail', f'Failed link={link} is not https or http')
         return False
 

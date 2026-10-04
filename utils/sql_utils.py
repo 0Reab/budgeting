@@ -1,7 +1,7 @@
 import sqlite3
 from utils.logger import log
 from utils.validation import has_dupes, valid_date, in_categories, validate_insert_params
-from utils.validation import categories_expenses, categories_income, currencies
+from utils.validation import categories_expenses, categories_income, currencies, wallet_types, valid_amount
 
 
 """ Module for: SQL queries, utilities, , formmated prints, DB connection object """
@@ -14,6 +14,17 @@ table_users = """
         password_hash TEXT UNIQUE
     )"""
 
+table_wallets = """
+    CREATE TABLE IF NOT EXISTS wallets (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        name TEXT,
+        amount REAL DEFAULT 0,
+        currency CHAR(3),
+        user_id INTEGER,
+        FOREIGN KEY (user_id) REFERENCES users(id)
+    )"""
+
+# this table is missing currency column
 table_expenses = """
     CREATE TABLE IF NOT EXISTS expenses (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -63,6 +74,10 @@ def sql_error_handler(error) -> None:
     elif 'no such table: users' in str(error):
         cursor.execute(table_users)
         log('info', 'had to create default users table')
+
+    elif 'no such table: wallets' in str(error):
+        cursor.execute(table_wallets)
+        log('info', 'had to create default wallets table')
     else:
         log('fail', 'unhandled sql error')
         raise Exception(f'database blew up. good luck -> {error}')
@@ -75,6 +90,10 @@ def execute(query, data=None) -> list:
     ''' run sql query '''
     # im not sure on best return type beacuse this does read/write/delete
     # successful fetch returns a list from data, write/delete returns what? [] or None? or object
+    # returns None on fail at the moment and list/tuple on
+    # also returning ([]) just gives me a headache for indexing later and loopoing, fix this then
+    # the code using unpacking as a bandaid for this
+
     conn, cursor = sql()
 
     def exec():
@@ -118,7 +137,34 @@ def register(user: str, password_hash: str) -> bool:
 
     execute(query, data)
     log('info', f'registered user {user}')
+
+    user_id = get_user_row('user', user, 'id')
+
+    if add_user_wallet(user_id) is not None:
+        log('info', f'created wallet for user {user} id={user_id}')
+    else:
+        log('fail', f'failed to create wallet for user {user} id={user_id}')
+
     return True
+
+
+def add_user_wallet(user_id, name='bank', amount=0):
+    ''' wallet name will have all currencies created '''
+    # possibly refactor this to be atomic, in case of errors.
+    # expected failure is with bad function call, so ill add better validation of args.
+
+    if amount not in range(1000000):
+        log('fail', f'amount ({amount} not in range of 0-1M')
+        return False
+
+    if name not in wallet_types:
+        log('fail', f'invalid wallet type {name}')
+        return False
+
+    for currency in currencies:  # creates for eg. 3x bank wallets of all currencies
+        data = (name, amount, currency, user_id)
+        query = 'INSERT INTO wallets (name, amount, currency, user_id) VALUES (?, ?, ?, ?)'
+        execute(query, data)
 
 
 def user_exists(user: str) -> bool:
@@ -172,6 +218,43 @@ def get_user_row(query_type, query_value, retrieve='all'):
         case 'password_hash': return row[2]
 
 
+def update_wallet(increase, amount, user_id, wallet_type=None, currency=None):
+    ''' call this on each add expense or add income func, to update the budget accordingly '''
+    # only update the wallet amount.
+    # based on user_id choose a row to update.
+    # take the existing amount and add/subtract based on increase=True / False
+
+    if not valid_amount(amount):
+        return False
+
+    if wallet_type not in wallet_types:
+        log('fail', f'wallet type {wallet_type} not accepted in {wallet_types}')
+        return False
+
+    if currency not in currencies:
+        log('fail', f'currency {currency} not accepted in {currencies}')
+        return False
+
+    data = (user_id, wallet_type, currency)
+
+    fetch_query = 'SELECT amount FROM wallets WHERE user_id = (?) AND name = (?) AND currency = (?) LIMIT 1'
+    current_amount = execute(fetch_query, data)[0][0]  # for some reason it returned as this [(0.0,)] so acting accordingly rip (will fix this one day)
+
+    if current_amount is None:
+        log('fail', 'error current amount is None.')
+        return False
+
+    if increase:
+        current_amount += float(amount)  # fix this if DB type switches to INT type, and below too
+    else:
+        current_amount -= float(amount)
+
+    data = (current_amount, user_id, wallet_type, currency)
+
+    update_query = 'UPDATE wallets SET amount = (?) WHERE user_id = (?) AND name = (?) AND currency = (?)'
+    return execute(update_query, data)
+
+
 def insert_expense(item: list, user_id: str) -> bool:
     """ add entry to DB table with last validation step """
     data = [category, name, price, amount, date] = item
@@ -185,7 +268,8 @@ def insert_expense(item: list, user_id: str) -> bool:
 
     execute(query, data)
 
-    log('info', f'{name}')
+    log('info', f'insert expese {category} of {amount}')
+    update_wallet(False, amount, user_id, 'bank', 'RSD')
     return True
 
 
@@ -214,7 +298,8 @@ def insert_income(category, description, converted_amount, link, amount, currenc
 
     execute(query, data)
 
-    log('info', f'insert {category} of {amount} {currency}')
+    log('info', f'insert income {category} of {amount} {currency}')
+    update_wallet(True, amount, user_id, 'bank', currency)
     return True
 
 
@@ -244,16 +329,58 @@ def db_delete(item_id: str, user_id: str, table: str) -> bool:
     if not user_owned(user_id, item_id, table):
         return False
 
+    fetch = get_item(item_id, user_id, table)
+
+    # income conversion not implemented - ingore for now
+    log('debug', f'get_item={fetch}')
+
+    if table == 'income':
+        amount = fetch[5]
+        currency = fetch[6]
+    elif table == 'expenses':
+        amount = fetch[5]
+        currency = 'RSD'  # bug because table doesn't have this col in expenses...
+
     execute(query, [item_id])
     log('ok', f'deleted entry ID {item_id}')
 
+    match table:  # hardcoded bank here for now.
+        case 'income': update_wallet(False, amount, user_id, 'bank', currency)
+        case 'expenses': update_wallet(True, amount, user_id, 'bank', currency)
+
     return True
+
+
+def get_item(item_id, user_id, table):
+    ''' fetch row from given table '''
+    query = f'SELECT * FROM {table} WHERE user_id = (?) AND id = (?)'
+    data = (user_id, item_id)
+
+    if not user_owned(user_id, item_id, table):
+        return False
+    return execute(query, data)[0]
+
+
+def show_budget_sum(user_id):
+    ''' For UI to always display - this is placeholder func, does not work properly atm '''
+    data = (user_id,)
+    query = 'SELECT * FROM wallets WHERE user_id = (?)'
+
+    rows = execute(query, data)
+    if rows is None:
+        return []
+
+    total = 0
+    for row in rows:
+        total += row[2]
+
+    return total
 
 
 def show_db(table: str, user_id: str) -> list:
     """ formatted string of all table entries """
 
-    if table not in ['expenses', 'income']:
+    if table not in ['expenses', 'income', 'wallets']:
         log('fail', f'{table} is not a valid table.')
         return []
 
@@ -270,6 +397,9 @@ def show_db(table: str, user_id: str) -> list:
 
     log('ok', 'print db')
 
+    # could split this formatting into a new func, could prolly make sum clever and nice
+    # deffo just make this into one for loop, then swtich statement and that will allow for one append line too.
+    # this can be made much better lol, soon TM
     if table == 'expenses':
         for entry in db:
             id, categ, name, total, qty, date, user_id = entry  # should change these to classes yeh?
@@ -280,6 +410,13 @@ def show_db(table: str, user_id: str) -> list:
         for entry in db:
             id, categ, desc, conver, link, amount, curr, date, user_id = entry  # should change these to classes yeh?
             line = f'ID - {id} | categ - {categ} | description - {desc} | converted_amount - {conver} | link - {link} | amount - {amount} | currency - {curr} | date - {date}'
+            result.append(line)
+
+    elif table == 'wallets':
+        for entry in db:
+            # name could possibly not be displayed not sure (frontend render issue)
+            id, name, amount, curr = entry
+            line = f'ID - {id} | name - {name} | amount - {amount} | currency - {curr}'
             result.append(line)
 
     # id, categ, desc, conv, link, amount, curr, date = entry

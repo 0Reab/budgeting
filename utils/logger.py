@@ -23,6 +23,7 @@ def log(log_type: str, message: str, **kwargs) -> bool | None:
         'FAIL': '\033[91m',
         'INFO': '\033[93m',
         'END': '\033[0m',
+        'DEBUG': '\033[94m',
     }
 
     log_type = log_type.upper()
@@ -46,7 +47,7 @@ def validate_call(log_type: str, message: str) -> bool:
         print(f'{bad_call} - {e}')
         return False
 
-    log_levels = ['INFO', 'OK', 'FAIL']
+    log_levels = ['INFO', 'OK', 'FAIL', 'END', 'DEBUG']
 
     if log_type not in log_levels:
         print(bad_call)

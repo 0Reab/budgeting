@@ -1,5 +1,8 @@
 # features to implement - ordered
 
+- for start, default to RSD currency, so only have to convert income atm.
+  (income table already has a row for converted value, just need to use it)
+- i should be using integers as money data type (floats are imprecise)
 - add delete user_id authorization check and then its checkpoint 2 push :)
 - user remember me from login form to clear cookie on page close.
 - remove all instances of variables called as id beacause thats a built in function lel
