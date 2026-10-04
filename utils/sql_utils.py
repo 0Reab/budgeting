@@ -334,6 +334,7 @@ def db_delete(item_id: str, user_id: str, table: str) -> bool:
     # income conversion not implemented - ingore for now
     log('debug', f'get_item={fetch}')
 
+    # another reason to use classes
     if table == 'income':
         amount = fetch[5]
         currency = fetch[6]
@@ -393,33 +394,25 @@ def show_db(table: str, user_id: str) -> list:
         log('fail', 'no data fetched')
         return []
 
-    result = []
-
     log('ok', 'print db')
 
-    # could split this formatting into a new func, could prolly make sum clever and nice
-    # deffo just make this into one for loop, then swtich statement and that will allow for one append line too.
-    # this can be made much better lol, soon TM
-    if table == 'expenses':
-        for entry in db:
-            id, categ, name, total, qty, date, user_id = entry  # should change these to classes yeh?
-            line = f'ID - {id} | categ - {categ} | name - {name} | total - {total} | qty - {qty} | date - {date}'
-            result.append(line)
+    result = []
 
-    elif table == 'income':
-        for entry in db:
-            id, categ, desc, conver, link, amount, curr, date, user_id = entry  # should change these to classes yeh?
-            line = f'ID - {id} | categ - {categ} | description - {desc} | converted_amount - {conver} | link - {link} | amount - {amount} | currency - {curr} | date - {date}'
-            result.append(line)
+    for entry in db:
+        match table:
+            case 'expenses':  # could use classes here
+                id, categ, name, total, qty, date, user_id = entry
+                line = f'ID - {id} | categ - {categ} | name - {name} | total - {total} | qty - {qty} | date - {date}'
 
-    elif table == 'wallets':
-        for entry in db:
-            # name could possibly not be displayed not sure (frontend render issue)
-            id, name, amount, curr, user_id = entry
-            line = f'ID - {id} | name - {name} | amount - {amount} | currency - {curr}'
-            result.append(line)
+            case 'income':
+                id, categ, desc, conver, link, amount, curr, date, user_id = entry
+                line = f'ID - {id} | categ - {categ} | description - {desc} | converted_amount - {conver} | link - {link} | amount - {amount} | currency - {curr} | date - {date}'
 
-    # id, categ, desc, conv, link, amount, curr, date = entry
+            case 'wallets':
+                id, name, amount, curr, user_id = entry
+                line = f'ID - {id} | name - {name} | amount - {amount} | currency - {curr}'
+
+        result.append(line)
     return result
 
 
