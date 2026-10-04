@@ -78,17 +78,19 @@ def execute(query, data=None) -> list:
     conn, cursor = sql()
 
     def exec():
+        result = None
+
         if data:
-            cursor.execute(query, data)
-            result = cursor.fetchall()
-            log('info', f'SQL -> {(query, data, result)}')
+            result = cursor.execute(query, data)
         else:
             result = cursor.execute(query)
-            log('info', f'SQL -> {(query, data, result)}')
+
+        result = cursor.fetchall()
 
         if result == [] or result == () or result == {}:
             result = None
 
+        log('info', f'SQL -> {(query, data, result)}')
         return result
 
     try:
@@ -122,7 +124,10 @@ def register(user: str, password_hash: str) -> bool:
 def user_exists(user: str) -> bool:
     query = "SELECT 1 FROM users WHERE user = ? LIMIT 1"
 
-    if execute(query, (user,)) is not None:
+    result = execute(query, (user,))
+    log('info', f'result={result}')
+
+    if result is not None:
         return True
 
 
@@ -141,7 +146,6 @@ def login(user: str, password_hash: str) -> bool:
 
 def get_user_row(query_type, query_value, retrieve='all'):
     ''' fetch user data via args like query (id/user/hash) and its value, and declare return type in (retreive)'''
-    conn, cursor = sql()
     allow = ['id', 'user', 'password_hash']
     log('ok', 'init')
 
@@ -152,21 +156,20 @@ def get_user_row(query_type, query_value, retrieve='all'):
     if type_fail or retrive_fail:
         log('fail', 'usage of this func')
 
-    cursor.execute(f"SELECT id, user, password_hash FROM users WHERE {query_type} = ?", (query_value,))
+    query = f"SELECT id, user, password_hash FROM users WHERE {query_type} = ?"
+    data = (query_value,)
+    result = execute(query, data)
 
-    try:
-        row = cursor.fetchone()
-        log('info', row)
-        if row is None:
-            return None
+    log('info', result)
+    if result is None:
+        return None
 
-        match retrieve:
-            case 'all': return row
-            case 'id': return row[0]
-            case 'user': return row[1]
-            case 'password_hash': return row[2]
-    finally:
-        conn.close()
+    row = result[0]  # unpack nested data struct
+    match retrieve:
+        case 'all': return row
+        case 'id': return row[0]
+        case 'user': return row[1]
+        case 'password_hash': return row[2]
 
 
 def insert_expense(item: list, user_id: str) -> bool:
@@ -257,15 +260,7 @@ def show_db(table: str, user_id: str) -> list:
     # should be safe since table and user_id are not user input
     query = f'SELECT * FROM {table} WHERE user_id = {user_id}'
 
-    conn, cursor = sql()
-    db = None
-    try:
-        cursor.execute(query)
-        db = cursor.fetchall()
-    except Exception as e:
-        sql_error_handler(e)
-    finally:
-        conn.close()
+    db = execute(query)
 
     if db is None:
         log('fail', 'no data fetched')
