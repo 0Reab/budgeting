@@ -91,7 +91,7 @@ def execute(query, data=None) -> list:
     # im not sure on best return type beacuse this does read/write/delete
     # successful fetch returns a list from data, write/delete returns what? [] or None? or object
     # returns None on fail at the moment and list/tuple on
-    # also returning ([]) just gives me a headache for indexing later and loopoing, fix this then
+    # also returning ([]) just gives me a headache for indexing later and looping, fix this then
     # the code using unpacking as a bandaid for this
 
     conn, cursor = sql()

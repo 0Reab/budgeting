@@ -94,16 +94,13 @@ def login_route():
         user = request.form['username']
         password = request.form['password']
 
-        log('ok', 'login attempt init')
         hash_in_db = get_user_row('user', user, 'password_hash')
-        log('info', f'hash in db debug {hash_in_db}')
 
         if hash_in_db is None:
             log('info', 'User does not exist.')
             return render_template('login.html', err=f'User {user} does not exist.')
 
         hash_in_db = hash_in_db.encode('utf8')
-        log('info', f'hash in db encoded debug {hash_in_db}')
 
         log('ok', 'checking password')
         try:
@@ -111,6 +108,7 @@ def login_route():
                 log('info', 'password passed check.')
                 session.clear()
                 login(user, hash_in_db)
+
                 user_id = get_user_row('user', user, retrieve='id')
                 session['name'] = user
                 session['id'] = user_id
@@ -232,7 +230,7 @@ def delete_entry():
         log('fail', err)
         return {'error': err}, 400
 
-    if id_list in range(50 + 1):
+    if id_list in range(50 + 1): # is this not bugged? like check len(id_list) not in range?
         err = 'Amount of IDs to delete must be 1-50.'
         log('fail', err)
         return {'error': err}, 400
