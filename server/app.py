@@ -259,7 +259,7 @@ def delete_entry():
 def show_table_data(table):
     """ display DB entries """
 
-    if table not in ['expenses', 'income']:
+    if table not in ['expenses', 'income', 'wallets']:
         return render_template('home.html', err_msg=f"Table {table} doesn't exist")
 
     status = request.args.get('status')

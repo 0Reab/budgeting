@@ -36,19 +36,29 @@
                                 <th class="edits" style="display: none">Edit</th>
                                 <th class="edits" style="display: none">ID</th>
 
-                                <th class="e">Category</th>
-                                <th class="e">Name</th>
-                                <th class="e">Total</th>
-                                <th class="e">Qty</th>
-                                <th class="e">Date</th>
+                                <th class="tag-income">Category</th>
+                                <th class="tag-income">Amount</th>
+                                <th class="tag-income">Currency</th>
+                                <th class="tag-income">Description</th>
+                                <th class="tag-income">Link</th>
+                                <th class="tag-income">In RSD</th>
+                                <th class="tag-income">Date</th>
 
-                                <th class="i">Category</th>
-                                <th class="i">Amount</th>
-                                <th class="i">Currency</th>
-                                <th class="i">Description</th>
-                                <th class="i">Link</th>
-                                <th class="i">In RSD</th>
-                                <th class="i">Date</th>
+                                <th class="tag-expenses">Category</th>
+                                <th class="tag-expenses">Name</th>
+                                <th class="tag-expenses">Total</th>
+                                <th class="tag-expenses">Quantity</th>
+                                <th class="tag-expenses">Date</th>
+
+                                <th class="tag-upload">Category</th>
+                                <th class="tag-upload">Name</th>
+                                <th class="tag-upload">Total</th>
+                                <th class="tag-upload">Quantity</th>
+                                <th class="tag-upload">Date</th>
+
+                                <th class="tag-wallets">Wallet</th>
+                                <th class="tag-wallets">Amount</th>
+                                <th class="tag-wallets">Currency</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -85,9 +95,17 @@
 
                                 {% include "expenses_table.html" %}
 
+                                <!-- upload table rows -->
+
+                                {% include "upload_table.html" %}
+
                                 <!-- income table rows -->
 
                                 {% include "income_table.html" %}
+
+                                <!-- wallets table rows -->
+
+                                {% include "wallets_table.html" %}
 
                                 <!-- yep -->
                             </tr>

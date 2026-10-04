@@ -222,13 +222,38 @@ function setupNavigation() {
     }
 
     if (loc === '/show/income') {
-        hideElementsClass('e');
-    } else if (loc === '/show/expenses') {
-        hideElementsClass('i');
-    } else if (loc === '/upload') {
-        hideElementsClass('i');
-    }
+        hideElementsClass('tag-wallets');
+        hideElementsClass('tag-expenses');
+        hideElementsClass('tag-upload');
 
+    } else if (loc === '/show/expenses') {
+        hideElementsClass('tag-wallets');
+        hideElementsClass('tag-income');
+        hideElementsClass('tag-upload');
+
+    } else if (loc === '/upload') {
+        hideElementsClass('tag-wallets');
+        hideElementsClass('tag-income');
+        hideElementsClass('tag-expenses');
+
+    } else if (loc === '/show/wallets') {
+        hideElementsClass('tag-upload');
+        hideElementsClass('tag-income');
+        hideElementsClass('tag-expenses');
+    }
+/*
+
+    } else if (loc === '/show/wallets') {
+        hideElementsClass('tag-income');
+        hideElementsClass('tag-expenses');
+        hideElementsClass('tag-upload');
+
+    } else if (loc === '/upload') {
+        hideElementsClass('tag-income');
+        hideElementsClass('tag-expenses');
+        hideElementsClass('tag-wallets');
+    }
+*/
     if (loc != '/') {
         document.getElementById("myChartScroll").style.display = 'inline';
     }

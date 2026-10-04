@@ -338,7 +338,7 @@ def db_delete(item_id: str, user_id: str, table: str) -> bool:
         amount = fetch[5]
         currency = fetch[6]
     elif table == 'expenses':
-        amount = fetch[5]
+        amount = fetch[3]
         currency = 'RSD'  # bug because table doesn't have this col in expenses...
 
     execute(query, [item_id])
@@ -415,7 +415,7 @@ def show_db(table: str, user_id: str) -> list:
     elif table == 'wallets':
         for entry in db:
             # name could possibly not be displayed not sure (frontend render issue)
-            id, name, amount, curr = entry
+            id, name, amount, curr, user_id = entry
             line = f'ID - {id} | name - {name} | amount - {amount} | currency - {curr}'
             result.append(line)
 
