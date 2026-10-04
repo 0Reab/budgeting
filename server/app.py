@@ -200,7 +200,13 @@ def delete_entry():
     '''Delete database entries with given ID'''
 
     id_list = request.args.getlist("id")
-    table = request.referrer.split('/')[-1]
+    referrer = request.referrer.split('/')[-1]
+    table = ''
+
+    if '?' in referrer:
+        table = referrer.split('?')[0]
+    else:
+        table = referrer
 
     if table not in ('expenses', 'income'):
         err = 'Table not allowed.'
