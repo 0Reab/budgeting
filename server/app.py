@@ -28,6 +28,11 @@ def basic(code=200, msg=None, err='Route not found.'):
         return render_template('home.html', err=f'Error: {code} {err}'), code
 
 
+@app.template_global()
+def show_user_name():
+    return session.get('name')
+
+
 @app.before_request
 def check_session():
     path_no_auth = request.path.startswith(('/login', '/register', '/static'))
